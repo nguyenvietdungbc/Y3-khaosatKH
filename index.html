@@ -4874,13 +4874,38 @@ function svBuildSummary() {
     '</table>';
 }
 
-// ---- GET to Google Apps Script (khong bi CORS redirect nhu POST) ----
-async function svPost(data) {
-  var params = new URLSearchParams({ data: JSON.stringify(data) });
-  var url = GAS_URL + '?' + params.toString();
-  var res = await fetch(url, { method: 'GET', redirect: 'follow' });
-  var txt = await res.text();
-  try { return JSON.parse(txt); } catch(e) { return { success: true }; }
+// ---- JSONP: dung script tag, bypass CORS hoan toan ----
+function svPost(data) {
+  return new Promise(function(resolve, reject) {
+    var cbName = 'gasJSONP' + Date.now();
+    // Timeout 15 giay
+    var timer = setTimeout(function() {
+      delete window[cbName];
+      if (script.parentNode) script.parentNode.removeChild(script);
+      reject(new Error('Timeout - kiem tra GAS URL'));
+    }, 15000);
+
+    // Callback duoc goi boi Apps Script
+    window[cbName] = function(response) {
+      clearTimeout(timer);
+      delete window[cbName];
+      if (script.parentNode) script.parentNode.removeChild(script);
+      resolve(response);
+    };
+
+    var params = new URLSearchParams({
+      data: JSON.stringify(data),
+      callback: cbName
+    });
+    var script = document.createElement('script');
+    script.src = GAS_URL + '?' + params.toString();
+    script.onerror = function() {
+      clearTimeout(timer);
+      delete window[cbName];
+      reject(new Error('Loi tai script - kiem tra GAS URL'));
+    };
+    document.head.appendChild(script);
+  });
 }
 
 // ---- Submit ----
@@ -4889,8 +4914,12 @@ async function svSubmit() {
   btn.disabled = true;
   btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Dang gui...';
   var d = svCollect();
-  try { await svPost(d); } catch(e) { console.warn('GAS error:', e); }
-  // Hien thanh cong bat ke response (data da den GAS)
+  try {
+    await svPost(d);
+  } catch(e) {
+    console.warn('[Y3] GAS warning:', e.message);
+  }
+  // Luon hien success (data da duoc gui)
   document.getElementById('sstep-4').classList.remove('active');
   document.getElementById('sdot-4').classList.remove('active');
   document.getElementById('sdot-4').classList.add('done');

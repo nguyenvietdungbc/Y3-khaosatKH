@@ -19,39 +19,41 @@ const SHEET_ID   = '1WytwKAtL-wU7S0lWmHnj3Eo7A-tFzVnWLzD-14ikylc';
 const SHEET_NAME = 'Khảo sát KH';
 
 // ----------------------------------------------------------------
-// doGet — nhận dữ liệu qua query parameter (tránh CORS của POST)
+// doGet — nhận dữ liệu, hỗ trợ JSONP (bypass CORS hoàn toàn)
 // ----------------------------------------------------------------
 function doGet(e) {
-  // Cho phép CORS từ mọi nguồn
-  var output;
+  var callback = (e.parameter && e.parameter.callback) ? e.parameter.callback : null;
+  var dataStr  = (e.parameter && e.parameter.data)     ? e.parameter.data     : null;
 
+  var result;
   try {
-    var dataStr = e.parameter && e.parameter.data ? e.parameter.data : null;
-
-    // Nếu không có data → trả về status check
     if (!dataStr) {
-      output = ContentService
-        .createTextOutput(JSON.stringify({ status: 'Y3 Survey API OK', timestamp: new Date().toISOString() }))
-        .setMimeType(ContentService.MimeType.JSON);
-      return output;
+      // Health check
+      result = { status: 'Y3 API OK', timestamp: new Date().toISOString() };
+    } else {
+      var data = JSON.parse(dataStr);
+      saveToSheet(data);
+      sendEmailNotification(data);
+      result = { success: true, message: 'Da luu va gui email.' };
     }
-
-    var data = JSON.parse(dataStr);
-    saveToSheet(data);
-    sendEmailNotification(data);
-
-    output = ContentService
-      .createTextOutput(JSON.stringify({ success: true, message: 'Da luu va gui email thanh cong.' }))
-      .setMimeType(ContentService.MimeType.JSON);
-
   } catch (err) {
-    Logger.log('Error: ' + err.toString());
-    output = ContentService
-      .createTextOutput(JSON.stringify({ success: false, error: err.toString() }))
-      .setMimeType(ContentService.MimeType.JSON);
+    Logger.log('doGet error: ' + err.toString());
+    result = { success: false, error: err.toString() };
   }
 
-  return output;
+  var json = JSON.stringify(result);
+
+  // JSONP: trả về callback(json) để script tag đọc được, bypass CORS
+  if (callback) {
+    return ContentService
+      .createTextOutput(callback + '(' + json + ')')
+      .setMimeType(ContentService.MimeType.JAVASCRIPT);
+  }
+
+  // Thông thường trả JSON
+  return ContentService
+    .createTextOutput(json)
+    .setMimeType(ContentService.MimeType.JSON);
 }
 
 // doPost — giữ lại làm backup
