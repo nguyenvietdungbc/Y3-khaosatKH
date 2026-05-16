@@ -4742,176 +4742,248 @@ function rotateSugs(q){
 </script>
 
 
+
+
 <script>
+// Y3 Survey JS — function names khop voi HTML buttons
 const GAS_URL = 'https://script.google.com/macros/s/AKfycbwoHSR-WvtFgteFUzkO-NBrffDVa0WyhdlYIdM6rn6IZXTIURKbwMhPatA6Ktf-FUpd/exec';
-let surveyCurrentStep = 1;
+let svStep = 1;
 
-function selectScale(gid,btn,val){document.getElementById(gid).querySelectorAll('.scale-btn').forEach(b=>b.classList.remove('selected'));btn.classList.add('selected');btn.dataset.val=val;}
-function getScale(gid){var s=document.querySelector('#'+gid+' .scale-btn.selected');return s?s.dataset.val:'';}
-function syncCheck(inp){inp.closest('.q-option').classList.toggle('selected',inp.checked);}
-document.addEventListener('change',function(e){if(e.target.type==='radio'){var n=e.target.name;document.querySelectorAll('input[name="'+n+'"]').forEach(function(r){r.closest('.q-option').classList.toggle('selected',r.checked);});}});
-function getChecked(gid){var v=[];document.querySelectorAll('#'+gid+' input:checked').forEach(function(i){v.push(i.value);});return v.join(', ');}
-function getRadio(name){var s=document.querySelector('input[name="'+name+'"]:checked');return s?s.value:'';}
+// ---- Scale ----
+function svScale(gid, btn, val) {
+  document.getElementById(gid).querySelectorAll('.scale-btn').forEach(function(b){ b.classList.remove('selected'); });
+  btn.classList.add('selected');
+  btn.dataset.val = val;
+}
+function svGetScale(gid) {
+  var s = document.querySelector('#' + gid + ' .scale-btn.selected');
+  return s ? s.dataset.val : '';
+}
 
-function collectData(){
+// ---- Checkbox / Radio visual ----
+function svChk(inp) {
+  inp.closest('.q-opt').classList.toggle('selected', inp.checked);
+}
+document.addEventListener('change', function(e) {
+  if (e.target.type === 'radio') {
+    var name = e.target.name;
+    document.querySelectorAll('input[name="' + name + '"]').forEach(function(r) {
+      r.closest('.q-opt').classList.toggle('selected', r.checked);
+    });
+  }
+});
+
+// ---- Collect data ----
+function svGetChecked(gid) {
+  var v = [];
+  document.querySelectorAll('#' + gid + ' input:checked').forEach(function(i){ v.push(i.value); });
+  return v.join(', ');
+}
+function svGetRadio(name) {
+  var s = document.querySelector('input[name="' + name + '"]:checked');
+  return s ? s.value : '';
+}
+function svCollect() {
   return {
-    timestamp: new Date().toLocaleString('vi-VN'),
-    company:   (document.getElementById('sv_company').value||'').trim(),
-    taxcode:   (document.getElementById('sv_taxcode').value||'').trim(),
-    phone:     (document.getElementById('sv_phone').value||'').trim(),
-    email:     (document.getElementById('sv_email').value||'').trim(),
-    contact:   (document.getElementById('sv_contact').value||'').trim(),
-    title:     (document.getElementById('sv_title').value||'').trim(),
-    industry:  (document.getElementById('sv_industry').value||'').trim(),
-    size:      (document.getElementById('sv_size').value||'').trim(),
-    address:   (document.getElementById('sv_address').value||'').trim(),
-    mainbank:  getChecked('q_mainbank'), revenue:  getRadio('revenue'),
-    txcount:   getRadio('txcount'),      channels: getChecked('q_channels'),
-    painpoints:getChecked('q_painpoints'),collection:getRadio('collection'),
-    disbursement:getRadio('disbursement'),cms:getRadio('cms'),
-    erp:       getChecked('q_erp'),      apiscale: getScale('q_apiscale'),
-    expectation:(document.getElementById('sv_expectation').value||'').trim(),
-    timing:    getRadio('timing'),
+    timestamp:    new Date().toLocaleString('vi-VN'),
+    company:      (document.getElementById('sv_company').value || '').trim(),
+    taxcode:      (document.getElementById('sv_taxcode').value || '').trim(),
+    phone:        (document.getElementById('sv_phone').value || '').trim(),
+    email:        (document.getElementById('sv_email').value || '').trim(),
+    contact:      (document.getElementById('sv_contact').value || '').trim(),
+    title:        (document.getElementById('sv_title').value || '').trim(),
+    industry:     (document.getElementById('sv_industry').value || '').trim(),
+    size:         (document.getElementById('sv_size').value || '').trim(),
+    address:      (document.getElementById('sv_address').value || '').trim(),
+    mainbank:     svGetChecked('q_mainbank'),
+    revenue:      svGetRadio('revenue'),
+    txcount:      svGetRadio('txcount'),
+    channels:     svGetChecked('q_channels'),
+    painpoints:   svGetChecked('q_painpoints'),
+    collection:   svGetRadio('collection'),
+    disbursement: svGetRadio('disbursement'),
+    cms:          svGetRadio('cms'),
+    erp:          svGetChecked('q_erp'),
+    apiscale:     svGetScale('q_apiscale'),
+    expectation:  (document.getElementById('sv_expectation').value || '').trim(),
+    timing:       svGetRadio('timing'),
   };
 }
 
-function validateStep1(){
-  var ok=true;
-  ['sv_company','sv_taxcode','sv_phone','sv_contact','sv_industry'].forEach(function(id){
-    var el=document.getElementById(id);
-    if(!el.value.trim()){el.classList.add('error');el.addEventListener('input',function(){el.classList.remove('error');},{once:true});ok=false;}
+// ---- Validate step 1 ----
+function svValidate1() {
+  var ok = true;
+  ['sv_company','sv_taxcode','sv_phone','sv_contact','sv_industry'].forEach(function(id) {
+    var el = document.getElementById(id);
+    if (!el.value.trim()) {
+      el.classList.add('error');
+      el.addEventListener('input', function(){ el.classList.remove('error'); }, { once: true });
+      ok = false;
+    }
   });
-  if(!ok)showToast('Vui long dien day du cac truong bat buoc (*)','error');
+  if (!ok) svToast('Vui long dien day du cac truong bat buoc (*)', 'error');
   return ok;
 }
 
-function surveyNext(cur){
-  if(cur===1&&!validateStep1())return;
-  var dot=document.getElementById('sdot-'+cur);
-  dot.classList.remove('active');dot.classList.add('done');
-  dot.querySelector('.step-circle').innerHTML='<i class="fas fa-check" style="font-size:.7rem"></i>';
-  surveyCurrentStep=cur+1;
-  if(surveyCurrentStep===4)buildSummary();
-  document.getElementById('sstep-'+cur).classList.remove('active');
-  document.getElementById('sstep-'+surveyCurrentStep).classList.add('active');
-  document.getElementById('sdot-'+surveyCurrentStep).classList.add('active');
-  document.querySelector('.content-panel').scrollTo({top:0,behavior:'smooth'});
+// ---- Navigation ----
+function svNext(cur) {
+  if (cur === 1 && !svValidate1()) return;
+  var dot = document.getElementById('sdot-' + cur);
+  dot.classList.remove('active');
+  dot.classList.add('done');
+  dot.querySelector('.step-circle').innerHTML = '<i class="fas fa-check" style="font-size:.7rem"></i>';
+  svStep = cur + 1;
+  if (svStep === 4) svBuildSummary();
+  document.getElementById('sstep-' + cur).classList.remove('active');
+  document.getElementById('sstep-' + svStep).classList.add('active');
+  document.getElementById('sdot-' + svStep).classList.add('active');
+  document.querySelector('.content-panel').scrollTo({ top: 0, behavior: 'smooth' });
+}
+function svBack(cur) {
+  document.getElementById('sdot-' + cur).classList.remove('active');
+  var pd = document.getElementById('sdot-' + (cur - 1));
+  pd.classList.remove('done');
+  pd.classList.add('active');
+  pd.querySelector('.step-circle').textContent = cur - 1;
+  document.getElementById('sstep-' + cur).classList.remove('active');
+  svStep = cur - 1;
+  document.getElementById('sstep-' + svStep).classList.add('active');
+  document.querySelector('.content-panel').scrollTo({ top: 0, behavior: 'smooth' });
 }
 
-function surveyBack(cur){
-  document.getElementById('sdot-'+cur).classList.remove('active');
-  var pd=document.getElementById('sdot-'+(cur-1));
-  pd.classList.remove('done');pd.classList.add('active');pd.querySelector('.step-circle').textContent=cur-1;
-  document.getElementById('sstep-'+cur).classList.remove('active');
-  surveyCurrentStep=cur-1;
-  document.getElementById('sstep-'+surveyCurrentStep).classList.add('active');
-  document.querySelector('.content-panel').scrollTo({top:0,behavior:'smooth'});
+// ---- Summary ----
+function svEsc(s) {
+  return String(s || '-').replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
 }
-
-function escSv(s){return String(s||'-').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');}
-
-function buildSummary(){
-  var d=collectData();
-  var rows=[
-    ['Ten doanh nghiep',d.company],['Ma so thue',d.taxcode],
-    ['So dien thoai',d.phone],['Email',d.email||'-'],
-    ['Nguoi lien he',d.contact],['Chuc vu',d.title||'-'],
-    ['Nganh nghe',d.industry],['Quy mo',d.size||'-'],['Dia chi',d.address||'-'],
-    ['Ngan hang chinh',d.mainbank||'-'],['Doanh thu/thang',d.revenue||'-'],
-    ['So GD/thang',d.txcount||'-'],['Kenh thanh toan',d.channels||'-'],
-    ['Kho khan',d.painpoints||'-'],['Thu ho',d.collection||'-'],
-    ['Chi ho',d.disbursement||'-'],['CMS',d.cms||'-'],
-    ['ERP',d.erp||'-'],['Uu tien API',d.apiscale?d.apiscale+'/5':'-'],
-    ['Thoi diem TK',d.timing||'-'],['Ky vong',d.expectation||'-'],
+function svBuildSummary() {
+  var d = svCollect();
+  var rows = [
+    ['Ten doanh nghiep', d.company], ['Ma so thue', d.taxcode],
+    ['So dien thoai', d.phone],      ['Email', d.email || '-'],
+    ['Nguoi lien he', d.contact],    ['Chuc vu', d.title || '-'],
+    ['Nganh nghe', d.industry],      ['Quy mo', d.size || '-'],
+    ['Dia chi', d.address || '-'],   ['Ngan hang chinh', d.mainbank || '-'],
+    ['Doanh thu/thang', d.revenue || '-'], ['So GD/thang', d.txcount || '-'],
+    ['Kenh thanh toan', d.channels || '-'], ['Kho khan', d.painpoints || '-'],
+    ['Thu ho', d.collection || '-'], ['Chi ho', d.disbursement || '-'],
+    ['CMS/Pooling', d.cms || '-'],   ['ERP', d.erp || '-'],
+    ['Uu tien API', d.apiscale ? d.apiscale + '/5' : '-'],
+    ['Thoi diem TK', d.timing || '-'], ['Ky vong', d.expectation || '-'],
   ];
-  document.getElementById('survey-summary').innerHTML=
-    '<table class="summary-table">'+rows.map(function(r){return '<tr><td>'+r[0]+'</td><td>'+escSv(r[1])+'</td></tr>';}).join('')+'</table>';
+  document.getElementById('sv-summary').innerHTML =
+    '<table class="sv-sum-table">' +
+    rows.map(function(r){ return '<tr><td>' + r[0] + '</td><td>' + svEsc(r[1]) + '</td></tr>'; }).join('') +
+    '</table>';
 }
 
-async function postToGAS(data){
-  var res=await fetch(GAS_URL,{
-    method:'POST',
-    headers:{'Content-Type':'text/plain;charset=utf-8'},
-    body:JSON.stringify(data),
-    redirect:'follow',
+// ---- POST to Google Apps Script ----
+async function svPost(data) {
+  var res = await fetch(GAS_URL, {
+    method: 'POST',
+    headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+    body: JSON.stringify(data),
+    redirect: 'follow',
   });
-  var txt=await res.text();
-  try{return JSON.parse(txt);}catch(e){return {success:true,raw:txt};}
+  var txt = await res.text();
+  try { return JSON.parse(txt); } catch(e) { return { success: true, raw: txt }; }
 }
 
-async function surveySubmit(){
-  var btn=document.getElementById('sv-submit-btn');
-  btn.disabled=true;btn.innerHTML='<i class="fas fa-spinner fa-spin"></i> Dang gui...';
-  var d=collectData();
-  var ok=false;var errMsg='';
-  try{
-    var r=await postToGAS(d);
-    ok=(r&&(r.success===true||r.message));
-    if(!ok)errMsg=r&&r.error?r.error:'Khong nhan duoc phan hoi.';
-  }catch(e){errMsg=e.message||'Loi ket noi.';}
+// ---- Submit ----
+async function svSubmit() {
+  var btn = document.getElementById('sv-submit-btn');
+  btn.disabled = true;
+  btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Dang gui...';
+  var d = svCollect();
+  var ok = false; var errMsg = '';
+  try {
+    var r = await svPost(d);
+    ok = r && (r.success === true || !!r.message);
+    if (!ok) errMsg = (r && r.error) ? r.error : 'Khong nhan duoc phan hoi.';
+  } catch(e) { errMsg = e.message || 'Loi ket noi mang.'; }
 
+  // Show success screen
   document.getElementById('sstep-4').classList.remove('active');
   document.getElementById('sdot-4').classList.remove('active');
   document.getElementById('sdot-4').classList.add('done');
-  document.getElementById('surveyProgress').style.opacity='0.5';
-  document.getElementById('surveySuccess').classList.add('show');
+  document.getElementById('svProgress').style.opacity = '0.5';
+  document.getElementById('svSuccess').classList.add('show');
 
-  var st=document.getElementById('sv-email-status');
-  if(ok){
-    st.innerHTML='<div style="background:#dcfce7;border:1px solid #22c55e;border-radius:10px;padding:14px 18px;font-size:.85rem;color:#166534;text-align:left">'+
-      '<i class="fas fa-circle-check"></i> <strong>Da luu va gui email thanh cong!</strong> '+
-      'Du lieu da luu vao Google Sheets va email da gui den <strong>nguyenvietdung.bc@gmail.com</strong>.</div>';
-  }else{
-    st.innerHTML='<div style="background:#fee2e2;border:1px solid #ef4444;border-radius:10px;padding:14px 18px;font-size:.85rem;color:#991b1b;text-align:left">'+
-      '<i class="fas fa-circle-xmark"></i> <strong>Gui tu dong that bai.</strong> Loi: '+escSv(errMsg)+
-      ' - Bam <strong>"Gui Email thu cong"</strong> de gui truc tiep.</div>';
+  var st = document.getElementById('sv-status');
+  if (ok) {
+    st.innerHTML = '<div style="background:#dcfce7;border:1px solid #22c55e;border-radius:10px;padding:14px 18px;font-size:.85rem;color:#166534;text-align:left;margin-bottom:12px">'
+      + '<i class="fas fa-circle-check"></i> <strong>Da gui thanh cong!</strong> '
+      + 'Du lieu da luu vao Google Sheets va email da gui den nguyenvietdung.bc@gmail.com.</div>';
+  } else {
+    st.innerHTML = '<div style="background:#fee2e2;border:1px solid #ef4444;border-radius:10px;padding:14px 18px;font-size:.85rem;color:#991b1b;text-align:left;margin-bottom:12px">'
+      + '<i class="fas fa-circle-xmark"></i> <strong>Gui tu dong that bai.</strong> ' + svEsc(errMsg)
+      + ' &mdash; Bam <strong>Gui Email thu cong</strong> de gui truc tiep.</div>';
   }
-  btn.disabled=false;btn.innerHTML='<i class="fas fa-paper-plane"></i> Gui khao sat';
-  document.querySelector('.content-panel').scrollTo({top:0,behavior:'smooth'});
+  btn.disabled = false;
+  btn.innerHTML = '<i class="fas fa-paper-plane"></i> Gui khao sat';
+  document.querySelector('.content-panel').scrollTo({ top: 0, behavior: 'smooth' });
 }
 
-function sendEmailManual(){
-  var d=collectData();
-  var subj=encodeURIComponent('Y3 - khao sat khach hang: '+d.company);
-  var body=encodeURIComponent(
+// ---- Manual email fallback ----
+function svEmailManual() {
+  var d = svCollect();
+  var subj = encodeURIComponent('Y3 - khao sat khach hang: ' + d.company);
+  var body = encodeURIComponent(
     'Y3 KHAO SAT KHACH HANG\n'
-    +'Thoi gian: '+d.timestamp+'\n\n'
-    +'Ten DN: '+d.company+'\nMST: '+d.taxcode+'\nDT: '+d.phone+'\nEmail: '+d.email+'\n'
-    +'Nguoi LH: '+d.contact+' ('+d.title+')\nNganh: '+d.industry+'\nQuy mo: '+d.size+'\nDia chi: '+d.address+'\n\n'
-    +'THANH TOAN\nNgan hang: '+d.mainbank+'\nDoanh thu: '+d.revenue+'\nSo GD: '+d.txcount+'\n'
-    +'Kenh TT: '+d.channels+'\nKho khan: '+d.painpoints+'\n\n'
-    +'DONG TIEN\nThu ho: '+d.collection+'\nChi ho: '+d.disbursement+'\nCMS: '+d.cms+'\n'
-    +'ERP: '+d.erp+'\nAPI: '+d.apiscale+'\nTrien khai: '+d.timing+'\n\nKy vong:\n'+d.expectation
+    + 'Thoi gian: ' + d.timestamp + '\n\n'
+    + 'Ten DN: ' + d.company + '\nMST: ' + d.taxcode + '\nDT: ' + d.phone
+    + '\nEmail: ' + d.email + '\nNguoi LH: ' + d.contact + ' (' + d.title + ')'
+    + '\nNganh: ' + d.industry + '\nQuy mo: ' + d.size + '\nDia chi: ' + d.address
+    + '\n\nTHANH TOAN\nNgan hang: ' + d.mainbank + '\nDoanh thu: ' + d.revenue
+    + '\nSo GD: ' + d.txcount + '\nKenh TT: ' + d.channels
+    + '\nKho khan: ' + d.painpoints
+    + '\n\nDONG TIEN\nThu ho: ' + d.collection + '\nChi ho: ' + d.disbursement
+    + '\nCMS: ' + d.cms + '\nERP: ' + d.erp + '\nAPI: ' + d.apiscale
+    + '\nTrien khai: ' + d.timing + '\n\nKy vong:\n' + d.expectation
   );
-  window.open('mailto:nguyenvietdung.bc@gmail.com?subject='+subj+'&body='+body);
+  window.open('mailto:nguyenvietdung.bc@gmail.com?subject=' + subj + '&body=' + body);
 }
 
-function resetSurvey(){
-  ['sv_company','sv_taxcode','sv_phone','sv_email','sv_contact','sv_title','sv_address','sv_expectation'].forEach(function(id){var el=document.getElementById(id);if(el)el.value='';});
-  ['sv_industry','sv_size'].forEach(function(id){var el=document.getElementById(id);if(el)el.selectedIndex=0;});
-  document.querySelectorAll('.q-option input').forEach(function(i){i.checked=false;i.closest('.q-option').classList.remove('selected');});
-  document.querySelectorAll('.scale-btn').forEach(function(b){b.classList.remove('selected');delete b.dataset.val;});
-  for(var i=1;i<=4;i++){
-    var s=document.getElementById('sstep-'+i);if(s)s.classList.remove('active');
-    var dt=document.getElementById('sdot-'+i);
-    if(dt){dt.classList.remove('active','done');
-      if(i<4)dt.querySelector('.step-circle').textContent=i;
-      else dt.querySelector('.step-circle').innerHTML='<i class="fas fa-check" style="font-size:.7rem"></i>';}
+// ---- Reset ----
+function svReset() {
+  ['sv_company','sv_taxcode','sv_phone','sv_email','sv_contact','sv_title','sv_address','sv_expectation']
+    .forEach(function(id){ var el = document.getElementById(id); if (el) el.value = ''; });
+  ['sv_industry','sv_size']
+    .forEach(function(id){ var el = document.getElementById(id); if (el) el.selectedIndex = 0; });
+  document.querySelectorAll('.q-opt input').forEach(function(i){
+    i.checked = false; i.closest('.q-opt').classList.remove('selected');
+  });
+  document.querySelectorAll('.scale-btn').forEach(function(b){
+    b.classList.remove('selected'); delete b.dataset.val;
+  });
+  for (var i = 1; i <= 4; i++) {
+    var s = document.getElementById('sstep-' + i); if (s) s.classList.remove('active');
+    var dt = document.getElementById('sdot-' + i);
+    if (dt) {
+      dt.classList.remove('active','done');
+      if (i < 4) dt.querySelector('.step-circle').textContent = i;
+      else dt.querySelector('.step-circle').innerHTML = '<i class="fas fa-check" style="font-size:.7rem"></i>';
+    }
   }
   document.getElementById('sstep-1').classList.add('active');
   document.getElementById('sdot-1').classList.add('active');
-  document.getElementById('surveyProgress').style.opacity='1';
-  document.getElementById('surveySuccess').classList.remove('show');
-  document.getElementById('sv-email-status').innerHTML='';
-  surveyCurrentStep=1;
-  document.querySelector('.content-panel').scrollTo({top:0,behavior:'smooth'});
+  document.getElementById('svProgress').style.opacity = '1';
+  document.getElementById('svSuccess').classList.remove('show');
+  document.getElementById('sv-status').innerHTML = '';
+  svStep = 1;
+  document.querySelector('.content-panel').scrollTo({ top: 0, behavior: 'smooth' });
 }
 
-function showToast(msg,type){
-  var ex=document.getElementById('svToast');if(ex)ex.remove();
-  var t=document.createElement('div');t.id='svToast';
-  t.style.cssText='position:fixed;bottom:100px;left:50%;transform:translateX(-50%);background:'+(type==='error'?'#ef4444':'#16a34a')+';color:white;padding:12px 24px;border-radius:10px;font-size:.88rem;font-weight:600;box-shadow:0 4px 20px rgba(0,0,0,.2);z-index:9999;max-width:90vw;text-align:center;';
-  t.textContent=msg;document.body.appendChild(t);setTimeout(function(){t.remove();},3500);
+// ---- Toast ----
+function svToast(msg, type) {
+  var ex = document.getElementById('svToast'); if (ex) ex.remove();
+  var t = document.createElement('div'); t.id = 'svToast';
+  t.style.cssText = 'position:fixed;bottom:100px;left:50%;transform:translateX(-50%);'
+    + 'background:' + (type === 'error' ? '#ef4444' : '#16a34a') + ';color:white;'
+    + 'padding:12px 24px;border-radius:10px;font-size:.88rem;font-weight:600;'
+    + 'box-shadow:0 4px 20px rgba(0,0,0,.2);z-index:9999;max-width:90vw;text-align:center;';
+  t.textContent = msg;
+  document.body.appendChild(t);
+  setTimeout(function(){ t.remove(); }, 3500);
 }
 </script>
 
