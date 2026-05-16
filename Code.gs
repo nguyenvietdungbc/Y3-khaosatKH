@@ -113,30 +113,44 @@ function saveToSheet(d) {
     sheet.setColumnWidth(22, 320);
   }
 
-  // Thêm dòng dữ liệu
+  // Helper: trả về giá trị hoặc '—' nếu rỗng
+  var val = function(v) { return (v && v.toString().trim()) ? v.toString().trim() : '—'; };
+
+  // Timestamp đầy đủ ngày giờ theo định dạng Việt Nam
+  var now = new Date();
+  var ts  = d.timestamp || (
+    ('0'+now.getDate()).slice(-2)   + '/'  +
+    ('0'+(now.getMonth()+1)).slice(-2) + '/' +
+    now.getFullYear() + ' ' +
+    ('0'+now.getHours()).slice(-2)  + ':' +
+    ('0'+now.getMinutes()).slice(-2)+ ':' +
+    ('0'+now.getSeconds()).slice(-2)
+  );
+
+  // Thêm dòng dữ liệu — luôn đủ 22 cột
   sheet.appendRow([
-    d.timestamp    || new Date().toLocaleString('vi-VN'),
-    d.company      || '',
-    d.taxcode      || '',
-    d.phone        || '',
-    d.email        || '',
-    d.contact      || '',
-    d.title        || '',
-    d.industry     || '',
-    d.size         || '',
-    d.address      || '',
-    d.mainbank     || '',
-    d.revenue      || '',
-    d.txcount      || '',
-    d.channels     || '',
-    d.painpoints   || '',
-    d.collection   || '',
-    d.disbursement || '',
-    d.cms          || '',
-    d.erp          || '',
-    d.apiscale     || '',
-    d.timing       || '',
-    d.expectation  || ''
+    ts,
+    val(d.company),
+    val(d.taxcode),
+    val(d.phone),
+    val(d.email),
+    val(d.contact),
+    val(d.title),
+    val(d.industry),
+    val(d.size),
+    val(d.address),
+    val(d.mainbank),
+    val(d.revenue),
+    val(d.txcount),
+    val(d.channels),
+    val(d.painpoints),
+    val(d.collection),
+    val(d.disbursement),
+    val(d.cms),
+    val(d.erp),
+    val(d.apiscale),
+    val(d.timing),
+    val(d.expectation)
   ]);
 
   // Màu xen kẽ cho dễ đọc
