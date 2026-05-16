@@ -6,7 +6,6 @@
   <title>Y3 — Sáng kiến Thanh toán & Quản lý Dòng tiền | VietinBank</title>
   <link href="https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@300;400;500;600;700;800&display=swap" rel="stylesheet" />
   <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" rel="stylesheet" />
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
   <style>
     :root {
       /* === BỘ MÀU VIETINBANK CHÍNH THỨC === */
@@ -1408,9 +1407,10 @@
         <span>Cán bộ Ban SME phụ trách Chi nhánh</span>
       </div>
 
-      <div class="sidebar-item" id="nav-survey" onclick="showPanel('survey')" style="border-top:2px solid var(--red-light);margin-top:8px;padding-top:8px">
+      <div class="sidebar-item" id="nav-survey" onclick="showPanel('survey')"
+           style="border-top:2px solid var(--red-light);margin-top:8px;padding-top:12px">
         <i class="fas fa-clipboard-list" style="color:var(--red)"></i>
-        <span style="color:var(--red);font-weight:600">Khảo sát thông tin KH</span>
+        <span style="color:var(--red);font-weight:700">Khảo sát thông tin KH</span>
       </div>
 
       <div class="sidebar-item" id="nav-faq" onclick="showPanel('faq')">
@@ -4075,537 +4075,295 @@
     </div>
 
 
-<!-- ======== PANEL: SURVEY ======== -->
+<!-- ======== PANEL: KHAO SAT ======== -->
 <div class="panel" id="panel-survey">
 <style>
-/* ===== SURVEY STYLES ===== */
-.survey-wrapper {
-  max-width: 780px; margin: 0 auto; padding: 36px 24px 60px;
-}
-.survey-header {
-  text-align: center; margin-bottom: 36px;
-}
-.survey-header .survey-badge {
-  display: inline-flex; align-items: center; gap: 8px;
-  background: var(--red-light); color: var(--red);
-  font-size: 0.8rem; font-weight: 700; padding: 6px 18px;
-  border-radius: 100px; margin-bottom: 16px; letter-spacing: 0.4px;
-}
-.survey-header h2 {
-  font-size: 1.75rem; font-weight: 800; color: var(--navy); margin-bottom: 10px;
-}
-.survey-header p { color: var(--gray); font-size: 0.95rem; }
-
-/* Progress bar */
-.survey-progress-wrap {
-  display: flex; align-items: center; gap: 0; margin-bottom: 36px; position: relative;
-}
-.survey-step-dot {
-  display: flex; flex-direction: column; align-items: center; gap: 6px; flex: 1; position: relative;
-}
-.survey-step-dot:not(:last-child)::after {
-  content: ''; position: absolute; top: 16px; left: 50%; width: 100%;
-  height: 2px; background: var(--border); z-index: 0; transition: background 0.4s;
-}
-.survey-step-dot.done:not(:last-child)::after { background: var(--blue-mid); }
-.step-circle {
-  width: 32px; height: 32px; border-radius: 50%; border: 2px solid var(--border);
-  background: white; display: flex; align-items: center; justify-content: center;
-  font-size: 0.8rem; font-weight: 700; color: var(--gray); position: relative; z-index: 1;
-  transition: all 0.3s;
-}
-.survey-step-dot.active .step-circle {
-  border-color: var(--blue-dark); background: var(--blue-dark); color: white;
-}
-.survey-step-dot.done .step-circle {
-  border-color: var(--blue-mid); background: var(--blue-mid); color: white;
-}
-.step-label {
-  font-size: 0.7rem; color: var(--gray); text-align: center; line-height: 1.3; max-width: 80px;
-}
-.survey-step-dot.active .step-label { color: var(--blue-dark); font-weight: 600; }
-.survey-step-dot.done .step-label { color: var(--blue-mid); }
-
-/* Step panels */
-.survey-step { display: none; animation: fadeInStep 0.35s ease; }
-.survey-step.active { display: block; }
-@keyframes fadeInStep { from { opacity:0; transform:translateY(12px); } to { opacity:1; transform:translateY(0); } }
-
-/* Form fields */
-.survey-card {
-  background: white; border-radius: var(--radius-lg); padding: 28px 32px;
-  box-shadow: var(--shadow); margin-bottom: 20px;
-}
-.survey-card-title {
-  font-size: 1rem; font-weight: 700; color: var(--navy);
-  display: flex; align-items: center; gap: 10px; margin-bottom: 24px;
-  padding-bottom: 14px; border-bottom: 2px solid var(--blue-pale);
-}
-.survey-card-title i { color: var(--blue-dark); font-size: 1.1rem; }
-.form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin-bottom: 16px; }
-.form-row.full { grid-template-columns: 1fr; }
-.form-group { display: flex; flex-direction: column; gap: 6px; }
-.form-group label {
-  font-size: 0.82rem; font-weight: 600; color: #374151;
-}
-.form-group label .req { color: var(--red); margin-left: 3px; }
-.form-group input, .form-group select, .form-group textarea {
-  border: 1.5px solid var(--border); border-radius: 10px;
-  padding: 11px 14px; font-family: inherit; font-size: 0.88rem;
-  outline: none; transition: border-color 0.2s, box-shadow 0.2s;
-  background: #fafafa; color: #1f2937;
-}
-.form-group input:focus, .form-group select:focus, .form-group textarea:focus {
-  border-color: var(--blue-mid); background: white;
-  box-shadow: 0 0 0 3px rgba(0,125,183,0.1);
-}
-.form-group input.error, .form-group select.error { border-color: var(--red); }
-.form-group textarea { resize: vertical; min-height: 80px; }
-.form-group .field-hint { font-size: 0.75rem; color: var(--gray); margin-top: 3px; }
-
-/* Question groups */
-.q-group { margin-bottom: 20px; }
-.q-label {
-  font-size: 0.9rem; font-weight: 600; color: #1f2937;
-  margin-bottom: 12px; display: flex; align-items: flex-start; gap: 8px;
-}
-.q-label .q-num {
-  width: 24px; height: 24px; border-radius: 50%; background: var(--blue-pale);
-  color: var(--blue-dark); font-size: 0.72rem; font-weight: 700;
-  display: flex; align-items: center; justify-content: center; flex-shrink: 0; margin-top: 1px;
-}
-.q-options { display: flex; flex-direction: column; gap: 8px; }
-.q-option {
-  display: flex; align-items: center; gap: 10px; padding: 10px 14px;
-  border: 1.5px solid var(--border); border-radius: 10px; cursor: pointer;
-  transition: all 0.2s; background: #fafafa;
-}
-.q-option:hover { border-color: var(--blue-mid); background: var(--blue-pale); }
-.q-option input[type="radio"], .q-option input[type="checkbox"] {
-  accent-color: var(--blue-dark); width: 16px; height: 16px; flex-shrink: 0;
-  border: none; padding: 0; box-shadow: none; background: transparent;
-}
-.q-option input[type="radio"]:focus, .q-option input[type="checkbox"]:focus {
-  box-shadow: none; border: none;
-}
-.q-option.selected { border-color: var(--blue-dark); background: var(--blue-pale); }
-.q-option span { font-size: 0.88rem; color: #374151; }
-
-.q-options.grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
-
-/* Scale / Rating */
-.scale-row { display: flex; gap: 8px; flex-wrap: wrap; }
-.scale-btn {
-  width: 44px; height: 44px; border-radius: 10px; border: 1.5px solid var(--border);
-  background: #fafafa; font-size: 0.88rem; font-weight: 600; cursor: pointer;
-  color: #374151; transition: all 0.2s; font-family: inherit;
-}
-.scale-btn:hover { border-color: var(--blue-mid); background: var(--blue-pale); }
-.scale-btn.selected { border-color: var(--blue-dark); background: var(--blue-dark); color: white; }
-
-/* Step navigation */
-.survey-nav {
-  display: flex; justify-content: space-between; align-items: center;
-  margin-top: 28px; padding-top: 20px; border-top: 1px solid var(--border);
-}
-.btn-survey-back {
-  background: var(--gray-light); border: 1px solid var(--border); color: #374151;
-  padding: 12px 28px; border-radius: 10px; font-family: inherit;
-  font-size: 0.9rem; font-weight: 600; cursor: pointer; transition: all 0.2s;
-  display: flex; align-items: center; gap: 8px;
-}
-.btn-survey-back:hover { background: #e5e7eb; }
-.btn-survey-next {
-  background: linear-gradient(135deg, var(--blue-dark), var(--blue-mid));
-  color: white; border: none; padding: 12px 32px; border-radius: 10px;
-  font-family: inherit; font-size: 0.9rem; font-weight: 700; cursor: pointer;
-  transition: all 0.2s; display: flex; align-items: center; gap: 8px;
-  box-shadow: 0 4px 16px rgba(0,89,147,0.3);
-}
-.btn-survey-next:hover { transform: translateY(-2px); box-shadow: 0 6px 20px rgba(0,89,147,0.4); }
-
-.btn-survey-submit {
-  background: linear-gradient(135deg, var(--red), var(--red-dark));
-  color: white; border: none; padding: 14px 40px; border-radius: 10px;
-  font-family: inherit; font-size: 1rem; font-weight: 700; cursor: pointer;
-  transition: all 0.2s; display: flex; align-items: center; gap: 10px;
-  box-shadow: 0 4px 16px rgba(215,18,73,0.35);
-}
-.btn-survey-submit:hover { transform: translateY(-2px); box-shadow: 0 6px 22px rgba(215,18,73,0.45); }
-
-/* Summary card */
-.summary-table { width: 100%; border-collapse: collapse; }
-.summary-table tr:not(:last-child) td { border-bottom: 1px solid var(--border); }
-.summary-table td { padding: 10px 6px; font-size: 0.88rem; }
-.summary-table td:first-child { color: var(--gray); width: 48%; }
-.summary-table td:last-child { font-weight: 600; color: #1f2937; }
-
-/* Success state */
-.survey-success {
-  display: none; text-align: center; padding: 60px 20px;
-}
-.survey-success.show { display: block; animation: fadeInStep 0.4s ease; }
-.success-icon {
-  width: 80px; height: 80px; background: linear-gradient(135deg, #22c55e, #16a34a);
-  border-radius: 50%; display: flex; align-items: center; justify-content: center;
-  margin: 0 auto 24px; font-size: 2rem; color: white;
-  box-shadow: 0 8px 24px rgba(34,197,94,0.35);
-}
-.survey-success h3 { font-size: 1.5rem; font-weight: 800; color: var(--navy); margin-bottom: 12px; }
-.survey-success p { color: var(--gray); margin-bottom: 24px; max-width: 480px; margin-left: auto; margin-right: auto; }
-.success-actions { display: flex; gap: 12px; justify-content: center; flex-wrap: wrap; }
-.btn-success-excel {
-  background: #16a34a; color: white; border: none; padding: 12px 28px;
-  border-radius: 10px; font-family: inherit; font-size: 0.9rem; font-weight: 700;
-  cursor: pointer; display: flex; align-items: center; gap: 8px; transition: all 0.2s;
-}
-.btn-success-excel:hover { background: #15803d; transform: translateY(-2px); }
-.btn-success-email {
-  background: var(--blue-dark); color: white; border: none; padding: 12px 28px;
-  border-radius: 10px; font-family: inherit; font-size: 0.9rem; font-weight: 700;
-  cursor: pointer; display: flex; align-items: center; gap: 8px; transition: all 0.2s;
-}
-.btn-success-email:hover { background: var(--blue-mid); transform: translateY(-2px); }
-.btn-success-new {
-  background: var(--gray-light); color: #374151; border: 1px solid var(--border); padding: 12px 28px;
-  border-radius: 10px; font-family: inherit; font-size: 0.9rem; font-weight: 600;
-  cursor: pointer; display: flex; align-items: center; gap: 8px; transition: all 0.2s;
-}
-.btn-success-new:hover { background: #e5e7eb; }
-
-@media(max-width:640px) {
-  .form-row { grid-template-columns: 1fr; }
-  .q-options.grid-2 { grid-template-columns: 1fr; }
-  .survey-card { padding: 20px 16px; }
-  .survey-wrapper { padding: 20px 12px 48px; }
-}
+.survey-wrapper{max-width:780px;margin:0 auto;padding:36px 24px 60px}
+.survey-header{text-align:center;margin-bottom:36px}
+.survey-badge{display:inline-flex;align-items:center;gap:8px;background:var(--red-light);color:var(--red);font-size:.8rem;font-weight:700;padding:6px 18px;border-radius:100px;margin-bottom:16px}
+.survey-header h2{font-size:1.75rem;font-weight:800;color:var(--navy);margin-bottom:10px}
+.survey-header p{color:var(--gray);font-size:.95rem}
+.survey-progress-wrap{display:flex;align-items:center;margin-bottom:36px;position:relative}
+.survey-step-dot{display:flex;flex-direction:column;align-items:center;gap:6px;flex:1;position:relative}
+.survey-step-dot:not(:last-child)::after{content:'';position:absolute;top:16px;left:50%;width:100%;height:2px;background:var(--border);z-index:0;transition:background .4s}
+.survey-step-dot.done:not(:last-child)::after{background:var(--blue-mid)}
+.step-circle{width:32px;height:32px;border-radius:50%;border:2px solid var(--border);background:white;display:flex;align-items:center;justify-content:center;font-size:.8rem;font-weight:700;color:var(--gray);position:relative;z-index:1;transition:all .3s}
+.survey-step-dot.active .step-circle{border-color:var(--blue-dark);background:var(--blue-dark);color:white}
+.survey-step-dot.done .step-circle{border-color:var(--blue-mid);background:var(--blue-mid);color:white}
+.step-label{font-size:.7rem;color:var(--gray);text-align:center;line-height:1.3;max-width:80px}
+.survey-step-dot.active .step-label{color:var(--blue-dark);font-weight:600}
+.survey-step-dot.done .step-label{color:var(--blue-mid)}
+.survey-step{display:none;animation:svFadeIn .35s ease}
+.survey-step.active{display:block}
+@keyframes svFadeIn{from{opacity:0;transform:translateY(12px)}to{opacity:1;transform:translateY(0)}}
+.survey-card{background:white;border-radius:var(--radius-lg);padding:28px 32px;box-shadow:var(--shadow);margin-bottom:20px}
+.survey-card-title{font-size:1rem;font-weight:700;color:var(--navy);display:flex;align-items:center;gap:10px;margin-bottom:24px;padding-bottom:14px;border-bottom:2px solid var(--blue-pale)}
+.survey-card-title i{color:var(--blue-dark);font-size:1.1rem}
+.sv-form-row{display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-bottom:16px}
+.sv-form-row.full{grid-template-columns:1fr}
+.sv-form-group{display:flex;flex-direction:column;gap:6px}
+.sv-form-group label{font-size:.82rem;font-weight:600;color:#374151}
+.sv-req{color:var(--red);margin-left:3px}
+.sv-form-group input,.sv-form-group select,.sv-form-group textarea{border:1.5px solid var(--border);border-radius:10px;padding:11px 14px;font-family:inherit;font-size:.88rem;outline:none;transition:border-color .2s,box-shadow .2s;background:#fafafa;color:#1f2937}
+.sv-form-group input:focus,.sv-form-group select:focus,.sv-form-group textarea:focus{border-color:var(--blue-mid);background:white;box-shadow:0 0 0 3px rgba(0,125,183,.1)}
+.sv-form-group input.error,.sv-form-group select.error{border-color:var(--red)}
+.sv-form-group textarea{resize:vertical;min-height:80px}
+.q-group{margin-bottom:20px}
+.q-label{font-size:.9rem;font-weight:600;color:#1f2937;margin-bottom:12px;display:flex;align-items:flex-start;gap:8px}
+.q-num{width:24px;height:24px;border-radius:50%;background:var(--blue-pale);color:var(--blue-dark);font-size:.72rem;font-weight:700;display:flex;align-items:center;justify-content:center;flex-shrink:0;margin-top:1px}
+.q-opts{display:flex;flex-direction:column;gap:8px}
+.q-opt{display:flex;align-items:center;gap:10px;padding:10px 14px;border:1.5px solid var(--border);border-radius:10px;cursor:pointer;transition:all .2s;background:#fafafa}
+.q-opt:hover{border-color:var(--blue-mid);background:var(--blue-pale)}
+.q-opt input[type=radio],.q-opt input[type=checkbox]{accent-color:var(--blue-dark);width:16px;height:16px;flex-shrink:0;border:none;padding:0;box-shadow:none;background:transparent}
+.q-opt input[type=radio]:focus,.q-opt input[type=checkbox]:focus{box-shadow:none}
+.q-opt.selected{border-color:var(--blue-dark);background:var(--blue-pale)}
+.q-opt span{font-size:.88rem;color:#374151}
+.q-opts.g2{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+.scale-row{display:flex;gap:8px;flex-wrap:wrap}
+.scale-btn{width:44px;height:44px;border-radius:10px;border:1.5px solid var(--border);background:#fafafa;font-size:.88rem;font-weight:600;cursor:pointer;color:#374151;transition:all .2s;font-family:inherit}
+.scale-btn:hover{border-color:var(--blue-mid);background:var(--blue-pale)}
+.scale-btn.selected{border-color:var(--blue-dark);background:var(--blue-dark);color:white}
+.sv-nav{display:flex;justify-content:space-between;align-items:center;margin-top:28px;padding-top:20px;border-top:1px solid var(--border)}
+.btn-sv-back{background:var(--gray-light);border:1px solid var(--border);color:#374151;padding:12px 28px;border-radius:10px;font-family:inherit;font-size:.9rem;font-weight:600;cursor:pointer;transition:all .2s;display:flex;align-items:center;gap:8px}
+.btn-sv-back:hover{background:#e5e7eb}
+.btn-sv-next{background:linear-gradient(135deg,var(--blue-dark),var(--blue-mid));color:white;border:none;padding:12px 32px;border-radius:10px;font-family:inherit;font-size:.9rem;font-weight:700;cursor:pointer;transition:all .2s;display:flex;align-items:center;gap:8px;box-shadow:0 4px 16px rgba(0,89,147,.3)}
+.btn-sv-next:hover{transform:translateY(-2px)}
+.btn-sv-submit{background:linear-gradient(135deg,var(--red),var(--red-dark));color:white;border:none;padding:14px 40px;border-radius:10px;font-family:inherit;font-size:1rem;font-weight:700;cursor:pointer;transition:all .2s;display:flex;align-items:center;gap:10px;box-shadow:0 4px 16px rgba(215,18,73,.35)}
+.btn-sv-submit:hover{transform:translateY(-2px)}
+.btn-sv-submit:disabled{opacity:.7;cursor:not-allowed;transform:none}
+.sv-sum-table{width:100%;border-collapse:collapse}
+.sv-sum-table tr:not(:last-child) td{border-bottom:1px solid var(--border)}
+.sv-sum-table td{padding:10px 6px;font-size:.88rem}
+.sv-sum-table td:first-child{color:var(--gray);width:48%}
+.sv-sum-table td:last-child{font-weight:600;color:#1f2937}
+.sv-success{display:none;text-align:center;padding:60px 20px}
+.sv-success.show{display:block}
+.sv-success-icon{width:80px;height:80px;background:linear-gradient(135deg,#22c55e,#16a34a);border-radius:50%;display:flex;align-items:center;justify-content:center;margin:0 auto 24px;font-size:2rem;color:white;box-shadow:0 8px 24px rgba(34,197,94,.35)}
+.sv-success h3{font-size:1.5rem;font-weight:800;color:var(--navy);margin-bottom:12px}
+.sv-success p{color:var(--gray);margin-bottom:20px;max-width:480px;margin-left:auto;margin-right:auto}
+.sv-actions{display:flex;gap:12px;justify-content:center;flex-wrap:wrap;margin-top:20px}
+.btn-sv-email{background:var(--blue-dark);color:white;border:none;padding:12px 28px;border-radius:10px;font-family:inherit;font-size:.9rem;font-weight:700;cursor:pointer;display:flex;align-items:center;gap:8px;transition:all .2s}
+.btn-sv-email:hover{background:var(--blue-mid);transform:translateY(-2px)}
+.btn-sv-new{background:var(--gray-light);color:#374151;border:1px solid var(--border);padding:12px 28px;border-radius:10px;font-family:inherit;font-size:.9rem;font-weight:600;cursor:pointer;display:flex;align-items:center;gap:8px;transition:all .2s}
+.btn-sv-new:hover{background:#e5e7eb}
+@media(max-width:640px){.sv-form-row{grid-template-columns:1fr}.q-opts.g2{grid-template-columns:1fr}.survey-card{padding:20px 16px}.survey-wrapper{padding:20px 12px 48px}}
 </style>
 
 <div class="survey-wrapper">
-  <!-- Header -->
   <div class="survey-header">
-    <div class="survey-badge"><i class="fas fa-clipboard-list"></i> Khảo sát nhu cầu</div>
-    <h2>Khảo sát Thông tin Khách hàng</h2>
-    <p>Giúp chúng tôi hiểu nhu cầu thanh toán & quản lý dòng tiền của doanh nghiệp bạn<br>để cán bộ VietinBank tư vấn giải pháp phù hợp nhất.</p>
+    <div class="survey-badge"><i class="fas fa-clipboard-list"></i> Khao sat nhu cau</div>
+    <h2>Kh&#7843;o sát Thông tin Khách hàng</h2>
+    <p>Giúp chúng tôi hi&#7875;u nhu c&#7847;u thanh toán &amp; qu&#7843;n lý dòng ti&#7873;n<br>&#273;&#7875; cán b&#7897; VietinBank t&#432; v&#7845;n gi&#7843;i pháp phù h&#7907;p nh&#7845;t.</p>
   </div>
 
-  <!-- Progress -->
-  <div class="survey-progress-wrap" id="surveyProgress">
-    <div class="survey-step-dot active" id="sdot-1">
-      <div class="step-circle">1</div>
-      <div class="step-label">Thông tin doanh nghiệp</div>
-    </div>
-    <div class="survey-step-dot" id="sdot-2">
-      <div class="step-circle">2</div>
-      <div class="step-label">Nhu cầu thanh toán</div>
-    </div>
-    <div class="survey-step-dot" id="sdot-3">
-      <div class="step-circle">3</div>
-      <div class="step-label">Quản lý dòng tiền</div>
-    </div>
-    <div class="survey-step-dot" id="sdot-4">
-      <div class="step-circle"><i class="fas fa-check" style="font-size:0.7rem"></i></div>
-      <div class="step-label">Xác nhận & Gửi</div>
-    </div>
+  <div class="survey-progress-wrap" id="svProgress">
+    <div class="survey-step-dot active" id="sdot-1"><div class="step-circle">1</div><div class="step-label">Thông tin DN</div></div>
+    <div class="survey-step-dot" id="sdot-2"><div class="step-circle">2</div><div class="step-label">Nhu c&#7847;u TT</div></div>
+    <div class="survey-step-dot" id="sdot-3"><div class="step-circle">3</div><div class="step-label">Dòng ti&#7873;n</div></div>
+    <div class="survey-step-dot" id="sdot-4"><div class="step-circle"><i class="fas fa-check" style="font-size:.7rem"></i></div><div class="step-label">Xác nh&#7853;n</div></div>
   </div>
 
-  <!-- ===== STEP 1: Thông tin doanh nghiệp ===== -->
+  <!-- STEP 1: Thong tin -->
   <div class="survey-step active" id="sstep-1">
     <div class="survey-card">
-      <div class="survey-card-title">
-        <i class="fas fa-building"></i> Thông tin doanh nghiệp
-        <span style="font-size:0.75rem;color:var(--red);font-weight:500;margin-left:auto"><i class="fas fa-asterisk" style="font-size:0.6rem"></i> Bắt buộc nhập</span>
+      <div class="survey-card-title"><i class="fas fa-building"></i> Thông tin Doanh nghi&#7879;p
+        <span style="font-size:.75rem;color:var(--red);font-weight:500;margin-left:auto">* B&#7855;t bu&#7897;c</span>
       </div>
-      <div class="form-row">
-        <div class="form-group">
-          <label>Tên doanh nghiệp <span class="req">*</span></label>
-          <input type="text" id="sv_company" placeholder="VD: Công ty TNHH ABC" />
-        </div>
-        <div class="form-group">
-          <label>Mã số thuế <span class="req">*</span></label>
-          <input type="text" id="sv_taxcode" placeholder="VD: 0123456789" maxlength="14"/>
-        </div>
+      <div class="sv-form-row">
+        <div class="sv-form-group"><label>Tên doanh nghi&#7879;p <span class="sv-req">*</span></label><input type="text" id="sv_company" placeholder="VD: Công ty TNHH ABC"/></div>
+        <div class="sv-form-group"><label>Mã s&#7889; thu&#7871; <span class="sv-req">*</span></label><input type="text" id="sv_taxcode" placeholder="VD: 0123456789" maxlength="14"/></div>
       </div>
-      <div class="form-row">
-        <div class="form-group">
-          <label>Số điện thoại liên hệ <span class="req">*</span></label>
-          <input type="tel" id="sv_phone" placeholder="VD: 0912 345 678" />
-        </div>
-        <div class="form-group">
-          <label>Email doanh nghiệp</label>
-          <input type="email" id="sv_email" placeholder="VD: contact@abc.vn" />
-        </div>
+      <div class="sv-form-row">
+        <div class="sv-form-group"><label>S&#7889; &#273;i&#7879;n tho&#7841;i <span class="sv-req">*</span></label><input type="tel" id="sv_phone" placeholder="VD: 0912 345 678"/></div>
+        <div class="sv-form-group"><label>Email doanh nghi&#7879;p</label><input type="email" id="sv_email" placeholder="VD: contact@abc.vn"/></div>
       </div>
-      <div class="form-row">
-        <div class="form-group">
-          <label>Người phụ trách / Người liên hệ <span class="req">*</span></label>
-          <input type="text" id="sv_contact" placeholder="Họ và tên người liên hệ" />
+      <div class="sv-form-row">
+        <div class="sv-form-group"><label>Ng&#432;&#7901;i liên h&#7879; <span class="sv-req">*</span></label><input type="text" id="sv_contact" placeholder="H&#7885; và tên"/></div>
+        <div class="sv-form-group"><label>Ch&#7913;c v&#7909;</label><input type="text" id="sv_title" placeholder="VD: Giám &#273;&#7889;c, K&#7871; toán tr&#432;&#7903;ng"/></div>
+      </div>
+      <div class="sv-form-row">
+        <div class="sv-form-group"><label>Ngành ngh&#7873; <span class="sv-req">*</span></label>
+          <select id="sv_industry"><option value="">-- Ch&#7885;n ngành --</option><option>B&#7879;nh vi&#7879;n / Y t&#7871;</option><option>Tr&#432;&#7901;ng h&#7885;c / Giáo d&#7909;c</option><option>Th&#432;&#417;ng m&#7841;i / Bán l&#7867;</option><option>S&#7843;n xu&#7845;t / Ch&#7871; bi&#7871;n</option><option>Xây d&#7921;ng / B&#7845;t &#273;&#7897;ng s&#7843;n</option><option>D&#7883;ch v&#7909; / Nhà hàng / Khách s&#7841;n</option><option>Logistics / V&#7853;n t&#7843;i</option><option>Công ngh&#7879; / Ph&#7847;n m&#7873;m</option><option>Nông nghi&#7879;p / Thu&#7927; s&#7843;n</option><option>Khác</option></select>
         </div>
-        <div class="form-group">
-          <label>Chức vụ</label>
-          <input type="text" id="sv_title" placeholder="VD: Giám đốc, Kế toán trưởng..." />
+        <div class="sv-form-group"><label>Quy mô</label>
+          <select id="sv_size"><option value="">-- Ch&#7885;n quy mô --</option><option>Siêu nh&#7887; (d&#432;&#7899;i 10 NS)</option><option>Nh&#7887; (10-50 NS)</option><option>V&#7915;a (50-200 NS)</option><option>L&#7899;n (trên 200 NS)</option></select>
         </div>
       </div>
-      <div class="form-row">
-        <div class="form-group">
-          <label>Ngành nghề kinh doanh <span class="req">*</span></label>
-          <select id="sv_industry">
-            <option value="">-- Chọn ngành nghề --</option>
-            <option>Bệnh viện / Y tế</option>
-            <option>Trường học / Giáo dục</option>
-            <option>Thương mại / Bán lẻ</option>
-            <option>Sản xuất / Chế biến</option>
-            <option>Xây dựng / Bất động sản</option>
-            <option>Dịch vụ / Nhà hàng / Khách sạn</option>
-            <option>Logistics / Vận tải</option>
-            <option>Công nghệ / Phần mềm</option>
-            <option>Nông nghiệp / Thủy sản</option>
-            <option>Khác</option>
-          </select>
-        </div>
-        <div class="form-group">
-          <label>Quy mô doanh nghiệp</label>
-          <select id="sv_size">
-            <option value="">-- Chọn quy mô --</option>
-            <option>Siêu nhỏ (dưới 10 nhân sự)</option>
-            <option>Nhỏ (10–50 nhân sự)</option>
-            <option>Vừa (50–200 nhân sự)</option>
-            <option>Lớn (trên 200 nhân sự)</option>
-          </select>
-        </div>
-      </div>
-      <div class="form-row full">
-        <div class="form-group">
-          <label>Địa chỉ doanh nghiệp</label>
-          <input type="text" id="sv_address" placeholder="Số nhà, đường, phường/xã, quận/huyện, tỉnh/thành" />
-        </div>
+      <div class="sv-form-row full">
+        <div class="sv-form-group"><label>&#272;&#7883;a ch&#7881;</label><input type="text" id="sv_address" placeholder="S&#7889; nhà, &#273;&#432;&#7901;ng, ph&#432;&#7901;ng/xã, qu&#7853;n/huy&#7879;n, t&#7881;nh/thành"/></div>
       </div>
     </div>
-    <div class="survey-nav">
-      <span style="font-size:0.82rem;color:var(--gray)"><i class="fas fa-lock" style="color:var(--blue-dark)"></i> Thông tin được bảo mật, chỉ dùng để tư vấn nội bộ</span>
-      <button class="btn-survey-next" onclick="surveyNext(1)">Tiếp theo <i class="fas fa-arrow-right"></i></button>
+    <div class="sv-nav">
+      <span style="font-size:.82rem;color:var(--gray)"><i class="fas fa-lock" style="color:var(--blue-dark)"></i> Thông tin b&#7843;o m&#7853;t, ch&#7881; dùng t&#432; v&#7845;n n&#7897;i b&#7897;</span>
+      <button class="btn-sv-next" onclick="svNext(1)">Ti&#7871;p theo <i class="fas fa-arrow-right"></i></button>
     </div>
   </div>
 
-  <!-- ===== STEP 2: Nhu cầu thanh toán ===== -->
+  <!-- STEP 2: Thanh toan -->
   <div class="survey-step" id="sstep-2">
     <div class="survey-card">
-      <div class="survey-card-title">
-        <i class="fas fa-credit-card"></i> Nhu cầu Thanh toán
-      </div>
-
+      <div class="survey-card-title"><i class="fas fa-credit-card"></i> Nhu c&#7847;u Thanh toán</div>
       <div class="q-group">
-        <div class="q-label"><div class="q-num">1</div> Hiện tại doanh nghiệp đang giao dịch ngân hàng nào là chính?</div>
-        <div class="q-options grid-2" id="q_mainbank">
-          <label class="q-option"><input type="checkbox" value="VietinBank" onchange="syncCheck(this,'q_mainbank')"><span>VietinBank</span></label>
-          <label class="q-option"><input type="checkbox" value="Vietcombank" onchange="syncCheck(this,'q_mainbank')"><span>Vietcombank</span></label>
-          <label class="q-option"><input type="checkbox" value="BIDV" onchange="syncCheck(this,'q_mainbank')"><span>BIDV</span></label>
-          <label class="q-option"><input type="checkbox" value="Agribank" onchange="syncCheck(this,'q_mainbank')"><span>Agribank</span></label>
-          <label class="q-option"><input type="checkbox" value="MB Bank" onchange="syncCheck(this,'q_mainbank')"><span>MB Bank</span></label>
-          <label class="q-option"><input type="checkbox" value="Techcombank" onchange="syncCheck(this,'q_mainbank')"><span>Techcombank</span></label>
-          <label class="q-option"><input type="checkbox" value="ACB" onchange="syncCheck(this,'q_mainbank')"><span>ACB</span></label>
-          <label class="q-option"><input type="checkbox" value="Khác" onchange="syncCheck(this,'q_mainbank')"><span>Ngân hàng khác</span></label>
+        <div class="q-label"><div class="q-num">1</div>Ngân hàng &#273;ang giao d&#7883;ch chính?</div>
+        <div class="q-opts g2" id="q_mainbank">
+          <label class="q-opt"><input type="checkbox" value="VietinBank" onchange="svChk(this)"><span>VietinBank</span></label>
+          <label class="q-opt"><input type="checkbox" value="Vietcombank" onchange="svChk(this)"><span>Vietcombank</span></label>
+          <label class="q-opt"><input type="checkbox" value="BIDV" onchange="svChk(this)"><span>BIDV</span></label>
+          <label class="q-opt"><input type="checkbox" value="Agribank" onchange="svChk(this)"><span>Agribank</span></label>
+          <label class="q-opt"><input type="checkbox" value="MB Bank" onchange="svChk(this)"><span>MB Bank</span></label>
+          <label class="q-opt"><input type="checkbox" value="Techcombank" onchange="svChk(this)"><span>Techcombank</span></label>
+          <label class="q-opt"><input type="checkbox" value="ACB" onchange="svChk(this)"><span>ACB</span></label>
+          <label class="q-opt"><input type="checkbox" value="Khac" onchange="svChk(this)"><span>Ngân hàng khác</span></label>
         </div>
       </div>
-
       <div class="q-group">
-        <div class="q-label"><div class="q-num">2</div> Doanh thu hàng tháng ước tính của doanh nghiệp?</div>
-        <div class="q-options" id="q_revenue">
-          <label class="q-option"><input type="radio" name="revenue" value="Dưới 1 tỷ"><span>Dưới 1 tỷ đồng</span></label>
-          <label class="q-option"><input type="radio" name="revenue" value="1–5 tỷ"><span>1 – 5 tỷ đồng</span></label>
-          <label class="q-option"><input type="radio" name="revenue" value="5–20 tỷ"><span>5 – 20 tỷ đồng</span></label>
-          <label class="q-option"><input type="radio" name="revenue" value="20–100 tỷ"><span>20 – 100 tỷ đồng</span></label>
-          <label class="q-option"><input type="radio" name="revenue" value="Trên 100 tỷ"><span>Trên 100 tỷ đồng</span></label>
+        <div class="q-label"><div class="q-num">2</div>Doanh thu hàng tháng &#432;&#7899;c tính?</div>
+        <div class="q-opts" id="q_revenue">
+          <label class="q-opt"><input type="radio" name="revenue" value="Duoi 1 ty"><span>D&#432;&#7899;i 1 t&#7927; &#273;&#7891;ng</span></label>
+          <label class="q-opt"><input type="radio" name="revenue" value="1-5 ty"><span>1 - 5 t&#7927; &#273;&#7891;ng</span></label>
+          <label class="q-opt"><input type="radio" name="revenue" value="5-20 ty"><span>5 - 20 t&#7927; &#273;&#7891;ng</span></label>
+          <label class="q-opt"><input type="radio" name="revenue" value="20-100 ty"><span>20 - 100 t&#7927; &#273;&#7891;ng</span></label>
+          <label class="q-opt"><input type="radio" name="revenue" value="Tren 100 ty"><span>Trên 100 t&#7927; &#273;&#7891;ng</span></label>
         </div>
       </div>
-
       <div class="q-group">
-        <div class="q-label"><div class="q-num">3</div> Số lượng giao dịch thanh toán ra/vào trung bình mỗi tháng?</div>
-        <div class="q-options" id="q_txcount">
-          <label class="q-option"><input type="radio" name="txcount" value="Dưới 50 GD"><span>Dưới 50 giao dịch</span></label>
-          <label class="q-option"><input type="radio" name="txcount" value="50–200 GD"><span>50 – 200 giao dịch</span></label>
-          <label class="q-option"><input type="radio" name="txcount" value="200–1000 GD"><span>200 – 1.000 giao dịch</span></label>
-          <label class="q-option"><input type="radio" name="txcount" value="Trên 1000 GD"><span>Trên 1.000 giao dịch</span></label>
+        <div class="q-label"><div class="q-num">3</div>S&#7889; giao d&#7883;ch trung bình m&#7895;i tháng?</div>
+        <div class="q-opts" id="q_txcount">
+          <label class="q-opt"><input type="radio" name="txcount" value="Duoi 50 GD"><span>D&#432;&#7899;i 50 giao d&#7883;ch</span></label>
+          <label class="q-opt"><input type="radio" name="txcount" value="50-200 GD"><span>50 - 200 giao d&#7883;ch</span></label>
+          <label class="q-opt"><input type="radio" name="txcount" value="200-1000 GD"><span>200 - 1.000 giao d&#7883;ch</span></label>
+          <label class="q-opt"><input type="radio" name="txcount" value="Tren 1000 GD"><span>Trên 1.000 giao d&#7883;ch</span></label>
         </div>
       </div>
-
       <div class="q-group">
-        <div class="q-label"><div class="q-num">4</div> Các kênh thanh toán doanh nghiệp đang sử dụng? (Chọn nhiều)</div>
-        <div class="q-options grid-2" id="q_channels">
-          <label class="q-option"><input type="checkbox" value="Internet Banking" onchange="syncCheck(this,'q_channels')"><span>Internet Banking</span></label>
-          <label class="q-option"><input type="checkbox" value="Mobile Banking" onchange="syncCheck(this,'q_channels')"><span>Mobile Banking</span></label>
-          <label class="q-option"><input type="checkbox" value="Thu hộ tự động" onchange="syncCheck(this,'q_channels')"><span>Thu hộ tự động</span></label>
-          <label class="q-option"><input type="checkbox" value="Chi hộ lương/NCC" onchange="syncCheck(this,'q_channels')"><span>Chi hộ lương / NCC</span></label>
-          <label class="q-option"><input type="checkbox" value="Chuyển khoản quầy" onchange="syncCheck(this,'q_channels')"><span>Chuyển khoản quầy</span></label>
-          <label class="q-option"><input type="checkbox" value="Thanh toán QR" onchange="syncCheck(this,'q_channels')"><span>Thanh toán QR</span></label>
-          <label class="q-option"><input type="checkbox" value="Thẻ POS" onchange="syncCheck(this,'q_channels')"><span>Thẻ / POS</span></label>
-          <label class="q-option"><input type="checkbox" value="API/Kết nối hệ thống" onchange="syncCheck(this,'q_channels')"><span>API / Kết nối hệ thống</span></label>
+        <div class="q-label"><div class="q-num">4</div>Kênh thanh toán &#273;ang s&#7917; d&#7909;ng? (Ch&#7885;n nhi&#7873;u)</div>
+        <div class="q-opts g2" id="q_channels">
+          <label class="q-opt"><input type="checkbox" value="Internet Banking" onchange="svChk(this)"><span>Internet Banking</span></label>
+          <label class="q-opt"><input type="checkbox" value="Mobile Banking" onchange="svChk(this)"><span>Mobile Banking</span></label>
+          <label class="q-opt"><input type="checkbox" value="Thu ho tu dong" onchange="svChk(this)"><span>Thu h&#7897; t&#7921; &#273;&#7897;ng</span></label>
+          <label class="q-opt"><input type="checkbox" value="Chi ho luong/NCC" onchange="svChk(this)"><span>Chi h&#7897; l&#432;&#417;ng / NCC</span></label>
+          <label class="q-opt"><input type="checkbox" value="Chuyen khoan quay" onchange="svChk(this)"><span>Chuy&#7875;n kho&#7843;n qu&#7847;y</span></label>
+          <label class="q-opt"><input type="checkbox" value="Thanh toan QR" onchange="svChk(this)"><span>Thanh toán QR</span></label>
+          <label class="q-opt"><input type="checkbox" value="The POS" onchange="svChk(this)"><span>Th&#7867; / POS</span></label>
+          <label class="q-opt"><input type="checkbox" value="API/He thong" onchange="svChk(this)"><span>API / K&#7871;t n&#7889;i h&#7879; th&#7889;ng</span></label>
         </div>
       </div>
-
       <div class="q-group">
-        <div class="q-label"><div class="q-num">5</div> Khó khăn lớn nhất trong thanh toán hiện tại của doanh nghiệp? (Chọn nhiều)</div>
-        <div class="q-options" id="q_painpoints">
-          <label class="q-option"><input type="checkbox" value="Đối soát thủ công mất thời gian" onchange="syncCheck(this,'q_painpoints')"><span>Đối soát thủ công mất nhiều thời gian</span></label>
-          <label class="q-option"><input type="checkbox" value="Chi phí giao dịch cao" onchange="syncCheck(this,'q_painpoints')"><span>Chi phí giao dịch cao</span></label>
-          <label class="q-option"><input type="checkbox" value="Chưa tự động hóa được" onchange="syncCheck(this,'q_painpoints')"><span>Chưa tự động hóa được quy trình thanh toán</span></label>
-          <label class="q-option"><input type="checkbox" value="Nhiều ngân hàng khó quản lý" onchange="syncCheck(this,'q_painpoints')"><span>Sử dụng nhiều ngân hàng, khó quản lý tập trung</span></label>
-          <label class="q-option"><input type="checkbox" value="Khó theo dõi công nợ" onchange="syncCheck(this,'q_painpoints')"><span>Khó theo dõi công nợ / dòng tiền thực tế</span></label>
-          <label class="q-option"><input type="checkbox" value="Không có vấn đề" onchange="syncCheck(this,'q_painpoints')"><span>Hiện tại không có khó khăn lớn</span></label>
+        <div class="q-label"><div class="q-num">5</div>Khó kh&#259;n l&#7899;n nh&#7845;t trong thanh toán hi&#7879;n t&#7841;i? (Ch&#7885;n nhi&#7873;u)</div>
+        <div class="q-opts" id="q_painpoints">
+          <label class="q-opt"><input type="checkbox" value="Doi soat thu cong" onchange="svChk(this)"><span>&#272;&#7889;i soát th&#7911; công m&#7845;t nhi&#7873;u th&#7901;i gian</span></label>
+          <label class="q-opt"><input type="checkbox" value="Chi phi cao" onchange="svChk(this)"><span>Chi phí giao d&#7883;ch cao</span></label>
+          <label class="q-opt"><input type="checkbox" value="Chua tu dong hoa" onchange="svChk(this)"><span>Ch&#432;a t&#7921; &#273;&#7897;ng hóa &#273;&#432;&#7907;c quy trình</span></label>
+          <label class="q-opt"><input type="checkbox" value="Nhieu NH kho quan ly" onchange="svChk(this)"><span>Nhi&#7873;u ngân hàng, khó qu&#7843;n lý t&#7853;p trung</span></label>
+          <label class="q-opt"><input type="checkbox" value="Kho theo doi dong tien" onchange="svChk(this)"><span>Khó theo dõi công n&#7907; / dòng ti&#7873;n</span></label>
+          <label class="q-opt"><input type="checkbox" value="Khong co van de" onchange="svChk(this)"><span>Hi&#7879;n t&#7841;i không có khó kh&#259;n l&#7899;n</span></label>
         </div>
       </div>
     </div>
-    <div class="survey-nav">
-      <button class="btn-survey-back" onclick="surveyBack(2)"><i class="fas fa-arrow-left"></i> Quay lại</button>
-      <button class="btn-survey-next" onclick="surveyNext(2)">Tiếp theo <i class="fas fa-arrow-right"></i></button>
+    <div class="sv-nav">
+      <button class="btn-sv-back" onclick="svBack(2)"><i class="fas fa-arrow-left"></i> Quay l&#7841;i</button>
+      <button class="btn-sv-next" onclick="svNext(2)">Ti&#7871;p theo <i class="fas fa-arrow-right"></i></button>
     </div>
   </div>
 
-  <!-- ===== STEP 3: Quản lý dòng tiền ===== -->
+  <!-- STEP 3: Dong tien -->
   <div class="survey-step" id="sstep-3">
     <div class="survey-card">
-      <div class="survey-card-title">
-        <i class="fas fa-money-bill-trend-up"></i> Nhu cầu Quản lý Dòng tiền
-      </div>
-
+      <div class="survey-card-title"><i class="fas fa-money-bill-trend-up"></i> Nhu c&#7847;u Qu&#7843;n lý Dòng ti&#7873;n</div>
       <div class="q-group">
-        <div class="q-label"><div class="q-num">6</div> Doanh nghiệp có nhu cầu thu hộ tự động (thu học phí, viện phí, phí dịch vụ...)?</div>
-        <div class="q-options" id="q_collection">
-          <label class="q-option"><input type="radio" name="collection" value="Có, đang cần ngay"><span>Có, đang cần triển khai ngay</span></label>
-          <label class="q-option"><input type="radio" name="collection" value="Có, cần trong 6 tháng tới"><span>Có, dự kiến cần trong 6 tháng tới</span></label>
-          <label class="q-option"><input type="radio" name="collection" value="Chưa có nhu cầu"><span>Chưa có nhu cầu rõ ràng</span></label>
-          <label class="q-option"><input type="radio" name="collection" value="Không phù hợp"><span>Không phù hợp với mô hình kinh doanh</span></label>
+        <div class="q-label"><div class="q-num">6</div>Nhu c&#7847;u thu h&#7897; t&#7921; &#273;&#7897;ng (h&#7885;c phí, vi&#7879;n phí, phí d&#7883;ch v&#7909;...)?</div>
+        <div class="q-opts" id="q_collection">
+          <label class="q-opt"><input type="radio" name="collection" value="Co, can ngay"><span>Có, &#273;ang c&#7847;n tri&#7875;n khai ngay</span></label>
+          <label class="q-opt"><input type="radio" name="collection" value="Co, can 6 thang"><span>Có, d&#7921; ki&#7871;n c&#7847;n trong 6 tháng t&#7899;i</span></label>
+          <label class="q-opt"><input type="radio" name="collection" value="Chua co nhu cau"><span>Ch&#432;a có nhu c&#7847;u rõ ràng</span></label>
+          <label class="q-opt"><input type="radio" name="collection" value="Khong phu hop"><span>Không phù h&#7907;p v&#7899;i mô hình kinh doanh</span></label>
         </div>
       </div>
-
       <div class="q-group">
-        <div class="q-label"><div class="q-num">7</div> Doanh nghiệp có nhu cầu chi hộ hàng loạt (lương, NCC, hoàn tiền...)?</div>
-        <div class="q-options" id="q_disbursement">
-          <label class="q-option"><input type="radio" name="disbursement" value="Có, đang cần ngay"><span>Có, đang cần triển khai ngay</span></label>
-          <label class="q-option"><input type="radio" name="disbursement" value="Có, cần trong 6 tháng tới"><span>Có, dự kiến cần trong 6 tháng tới</span></label>
-          <label class="q-option"><input type="radio" name="disbursement" value="Chưa có nhu cầu"><span>Chưa có nhu cầu rõ ràng</span></label>
+        <div class="q-label"><div class="q-num">7</div>Nhu c&#7847;u chi h&#7897; hàng lo&#7841;t (l&#432;&#417;ng, NCC, hoàn ti&#7873;n...)?</div>
+        <div class="q-opts" id="q_disbursement">
+          <label class="q-opt"><input type="radio" name="disbursement" value="Co, can ngay"><span>Có, &#273;ang c&#7847;n tri&#7875;n khai ngay</span></label>
+          <label class="q-opt"><input type="radio" name="disbursement" value="Co, can 6 thang"><span>Có, d&#7921; ki&#7871;n c&#7847;n trong 6 tháng t&#7899;i</span></label>
+          <label class="q-opt"><input type="radio" name="disbursement" value="Chua co nhu cau"><span>Ch&#432;a có nhu c&#7847;u rõ ràng</span></label>
         </div>
       </div>
-
       <div class="q-group">
-        <div class="q-label"><div class="q-num">8</div> Doanh nghiệp có cần quản lý tập trung dòng tiền nhiều tài khoản (CMS / Pooling)?</div>
-        <div class="q-options" id="q_cms">
-          <label class="q-option"><input type="radio" name="cms" value="Có, nhiều tài khoản tại VietinBank"><span>Có, đang có nhiều tài khoản tại VietinBank</span></label>
-          <label class="q-option"><input type="radio" name="cms" value="Có, nhiều ngân hàng"><span>Có, đang dùng nhiều ngân hàng muốn gom về 1 nơi</span></label>
-          <label class="q-option"><input type="radio" name="cms" value="Chưa cần"><span>Chưa cần, quy mô chưa đủ lớn</span></label>
-          <label class="q-option"><input type="radio" name="cms" value="Chưa biết giải pháp này"><span>Chưa biết giải pháp này, muốn tìm hiểu thêm</span></label>
+        <div class="q-label"><div class="q-num">8</div>Nhu c&#7847;u qu&#7843;n lý t&#7853;p trung dòng ti&#7873;n nhi&#7873;u tài kho&#7843;n (CMS / Pooling)?</div>
+        <div class="q-opts" id="q_cms">
+          <label class="q-opt"><input type="radio" name="cms" value="Co, nhieu TK VietinBank"><span>Có, &#273;ang có nhi&#7873;u tài kho&#7843;n t&#7841;i VietinBank</span></label>
+          <label class="q-opt"><input type="radio" name="cms" value="Co, nhieu NH"><span>Có, mu&#7889;n gom v&#7873; 1 ngân hàng</span></label>
+          <label class="q-opt"><input type="radio" name="cms" value="Chua can"><span>Ch&#432;a c&#7847;n, quy mô ch&#432;a &#273;&#7911; l&#7899;n</span></label>
+          <label class="q-opt"><input type="radio" name="cms" value="Chua biet"><span>Ch&#432;a bi&#7871;t gi&#7843;i pháp này, mu&#7889;n tìm hi&#7875;u</span></label>
         </div>
       </div>
-
       <div class="q-group">
-        <div class="q-label"><div class="q-num">9</div> Doanh nghiệp hiện đang dùng phần mềm kế toán / ERP nào?</div>
-        <div class="q-options grid-2" id="q_erp">
-          <label class="q-option"><input type="checkbox" value="MISA" onchange="syncCheck(this,'q_erp')"><span>MISA</span></label>
-          <label class="q-option"><input type="checkbox" value="Fast Accounting" onchange="syncCheck(this,'q_erp')"><span>Fast Accounting</span></label>
-          <label class="q-option"><input type="checkbox" value="SAP" onchange="syncCheck(this,'q_erp')"><span>SAP / Oracle</span></label>
-          <label class="q-option"><input type="checkbox" value="Bravo" onchange="syncCheck(this,'q_erp')"><span>Bravo</span></label>
-          <label class="q-option"><input type="checkbox" value="HIS (Y tế)" onchange="syncCheck(this,'q_erp')"><span>HIS (phần mềm y tế)</span></label>
-          <label class="q-option"><input type="checkbox" value="Phần mềm nội bộ" onchange="syncCheck(this,'q_erp')"><span>Phần mềm nội bộ tự xây dựng</span></label>
-          <label class="q-option"><input type="checkbox" value="Chưa dùng ERP" onchange="syncCheck(this,'q_erp')"><span>Chưa sử dụng ERP</span></label>
-          <label class="q-option"><input type="checkbox" value="Khác" onchange="syncCheck(this,'q_erp')"><span>Khác</span></label>
+        <div class="q-label"><div class="q-num">9</div>Ph&#7847;n m&#7873;m k&#7871; toán / ERP &#273;ang s&#7917; d&#7909;ng? (Ch&#7885;n nhi&#7873;u)</div>
+        <div class="q-opts g2" id="q_erp">
+          <label class="q-opt"><input type="checkbox" value="MISA" onchange="svChk(this)"><span>MISA</span></label>
+          <label class="q-opt"><input type="checkbox" value="Fast Accounting" onchange="svChk(this)"><span>Fast Accounting</span></label>
+          <label class="q-opt"><input type="checkbox" value="SAP/Oracle" onchange="svChk(this)"><span>SAP / Oracle</span></label>
+          <label class="q-opt"><input type="checkbox" value="Bravo" onchange="svChk(this)"><span>Bravo</span></label>
+          <label class="q-opt"><input type="checkbox" value="HIS" onchange="svChk(this)"><span>HIS (ph&#7847;n m&#7873;m y t&#7871;)</span></label>
+          <label class="q-opt"><input type="checkbox" value="PM noi bo" onchange="svChk(this)"><span>Ph&#7847;n m&#7873;m n&#7897;i b&#7897; t&#7921; xây</span></label>
+          <label class="q-opt"><input type="checkbox" value="Chua dung ERP" onchange="svChk(this)"><span>Ch&#432;a s&#7917; d&#7909;ng ERP</span></label>
+          <label class="q-opt"><input type="checkbox" value="Khac" onchange="svChk(this)"><span>Khác</span></label>
         </div>
       </div>
-
       <div class="q-group">
-        <div class="q-label"><div class="q-num">10</div> Mức độ ưu tiên kết nối API ngân hàng với hệ thống nội bộ?</div>
+        <div class="q-label"><div class="q-num">10</div>M&#7913;c &#432;u tiên k&#7871;t n&#7889;i API ngân hàng v&#7899;i h&#7879; th&#7889;ng n&#7897;i b&#7897;?</div>
         <div class="scale-row" id="q_apiscale">
-          <button class="scale-btn" onclick="selectScale('q_apiscale',this,'1')">1</button>
-          <button class="scale-btn" onclick="selectScale('q_apiscale',this,'2')">2</button>
-          <button class="scale-btn" onclick="selectScale('q_apiscale',this,'3')">3</button>
-          <button class="scale-btn" onclick="selectScale('q_apiscale',this,'4')">4</button>
-          <button class="scale-btn" onclick="selectScale('q_apiscale',this,'5')">5</button>
+          <button class="scale-btn" onclick="svScale('q_apiscale',this,'1')">1</button>
+          <button class="scale-btn" onclick="svScale('q_apiscale',this,'2')">2</button>
+          <button class="scale-btn" onclick="svScale('q_apiscale',this,'3')">3</button>
+          <button class="scale-btn" onclick="svScale('q_apiscale',this,'4')">4</button>
+          <button class="scale-btn" onclick="svScale('q_apiscale',this,'5')">5</button>
         </div>
-        <div style="display:flex;justify-content:space-between;font-size:0.72rem;color:var(--gray);margin-top:4px">
-          <span>1 = Không ưu tiên</span><span>5 = Rất ưu tiên</span>
-        </div>
+        <div style="display:flex;justify-content:space-between;font-size:.72rem;color:var(--gray);margin-top:4px"><span>1 = Không ưu tiên</span><span>5 = R&#7845;t &#432;u tiên</span></div>
       </div>
-
       <div class="q-group">
-        <div class="q-label"><div class="q-num">11</div> Kỳ vọng của doanh nghiệp khi hợp tác với VietinBank?</div>
-        <textarea id="sv_expectation" placeholder="VD: Muốn có giải pháp thu hộ học phí tự động, giảm nhân lực kế toán, có báo cáo dòng tiền tức thì..." style="width:100%;border:1.5px solid var(--border);border-radius:10px;padding:12px 14px;font-family:inherit;font-size:0.88rem;resize:vertical;min-height:90px;outline:none;transition:border-color 0.2s;background:#fafafa"></textarea>
+        <div class="q-label"><div class="q-num">11</div>K&#7923; v&#7885;ng khi h&#7907;p tác v&#7899;i VietinBank?</div>
+        <textarea id="sv_expectation" placeholder="VD: Mu&#7889;n có gi&#7843;i pháp thu h&#7897; h&#7885;c phí t&#7921; &#273;&#7897;ng, gi&#7843;m nhân l&#7921;c k&#7871; toán..." style="width:100%;border:1.5px solid var(--border);border-radius:10px;padding:12px 14px;font-family:inherit;font-size:.88rem;resize:vertical;min-height:90px;outline:none;background:#fafafa;transition:border-color .2s"></textarea>
       </div>
-
       <div class="q-group">
-        <div class="q-label"><div class="q-num">12</div> Thời điểm doanh nghiệp mong muốn được tư vấn / triển khai?</div>
-        <div class="q-options" id="q_timing">
-          <label class="q-option"><input type="radio" name="timing" value="Trong 1 tháng"><span>Trong vòng 1 tháng tới</span></label>
-          <label class="q-option"><input type="radio" name="timing" value="1–3 tháng"><span>Trong vòng 1 – 3 tháng</span></label>
-          <label class="q-option"><input type="radio" name="timing" value="3–6 tháng"><span>Trong vòng 3 – 6 tháng</span></label>
-          <label class="q-option"><input type="radio" name="timing" value="Chưa xác định"><span>Chưa xác định thời gian cụ thể</span></label>
+        <div class="q-label"><div class="q-num">12</div>Th&#7901;i &#273;i&#7875;m mong mu&#7889;n &#273;&#432;&#7907;c t&#432; v&#7845;n?</div>
+        <div class="q-opts" id="q_timing">
+          <label class="q-opt"><input type="radio" name="timing" value="Trong 1 thang"><span>Trong vòng 1 tháng t&#7899;i</span></label>
+          <label class="q-opt"><input type="radio" name="timing" value="1-3 thang"><span>Trong vòng 1 - 3 tháng</span></label>
+          <label class="q-opt"><input type="radio" name="timing" value="3-6 thang"><span>Trong vòng 3 - 6 tháng</span></label>
+          <label class="q-opt"><input type="radio" name="timing" value="Chua xac dinh"><span>Ch&#432;a xác &#273;&#7883;nh th&#7901;i gian</span></label>
         </div>
       </div>
     </div>
-    <div class="survey-nav">
-      <button class="btn-survey-back" onclick="surveyBack(3)"><i class="fas fa-arrow-left"></i> Quay lại</button>
-      <button class="btn-survey-next" onclick="surveyNext(3)">Xem tóm tắt <i class="fas fa-eye"></i></button>
+    <div class="sv-nav">
+      <button class="btn-sv-back" onclick="svBack(3)"><i class="fas fa-arrow-left"></i> Quay l&#7841;i</button>
+      <button class="btn-sv-next" onclick="svNext(3)">Xem tóm t&#7855;t <i class="fas fa-eye"></i></button>
     </div>
   </div>
 
-  <!-- ===== STEP 4: Xác nhận & Gửi ===== -->
+  <!-- STEP 4: Xac nhan -->
   <div class="survey-step" id="sstep-4">
     <div class="survey-card">
-      <div class="survey-card-title">
-        <i class="fas fa-check-circle"></i> Xác nhận thông tin khảo sát
-      </div>
-      <div id="survey-summary">
-        <!-- filled by JS -->
-      </div>
+      <div class="survey-card-title"><i class="fas fa-check-circle"></i> Xác nh&#7853;n thông tin kh&#7843;o sát</div>
+      <div id="sv-summary"></div>
     </div>
-    <div class="survey-nav">
-      <button class="btn-survey-back" onclick="surveyBack(4)"><i class="fas fa-arrow-left"></i> Chỉnh sửa</button>
-      <button class="btn-survey-submit" onclick="surveySubmit()">
-        <i class="fas fa-paper-plane"></i> Gửi khảo sát
-      </button>
+    <div class="sv-nav">
+      <button class="btn-sv-back" onclick="svBack(4)"><i class="fas fa-arrow-left"></i> Ch&#7881;nh s&#7917;a</button>
+      <button class="btn-sv-submit" id="sv-submit-btn" onclick="svSubmit()"><i class="fas fa-paper-plane"></i> G&#7917;i kh&#7843;o sát</button>
     </div>
   </div>
 
-  <!-- ===== SUCCESS ===== -->
-  <div class="survey-success" id="surveySuccess">
-    <div class="success-icon"><i class="fas fa-check"></i></div>
-    <h3>Gửi khảo sát thành công!</h3>
-    <p>Cảm ơn doanh nghiệp đã dành thời gian khảo sát.<br>Cán bộ VietinBank sẽ liên hệ tư vấn trong thời gian sớm nhất.</p>
-    <div id="sv-email-status"></div>
-    <div class="success-actions">
-      <button class="btn-success-excel" onclick="exportExcel()">
-        <i class="fas fa-file-excel"></i> Tải lại Excel
-      </button>
-      <button class="btn-success-email" onclick="sendEmailManual()">
-        <i class="fas fa-envelope"></i> Gửi Email thủ công
-      </button>
-      <button class="btn-success-new" onclick="resetSurvey()">
-        <i class="fas fa-plus"></i> Khảo sát mới
-      </button>
-    </div>
-        <!-- Hướng dẫn kết nối Google Apps Script -->
-    <div id="emailjs-guide" style="margin-top:28px;text-align:left;background:#f0f7ff;border:1px solid #bfdbfe;border-radius:12px;padding:22px 26px;max-width:600px;margin-left:auto;margin-right:auto">
-      <div style="font-weight:700;color:#1e40af;margin-bottom:14px;font-size:0.92rem">
-        <i class="fas fa-gears"></i> Kết nối Google Apps Script (1 lần — miễn phí vĩnh viễn)
-      </div>
-      <div style="font-size:0.82rem;color:#374151;line-height:1.9">
-        <div style="background:#1e3a5f;color:#e2e8f0;border-radius:8px;padding:14px 16px;font-family:monospace;font-size:0.8rem;margin-bottom:14px">
-          <div style="color:#94a3b8;margin-bottom:6px">// Mở index.html → tìm dòng này → dán URL vào:</div>
-          <span style="color:#fbbf24">const GAS_URL</span> = <span style="color:#86efac">'https://script.google.com/macros/s/<b>ABC…</b>/exec'</span>;
-        </div>
-        <b>Cách lấy URL (5 bước):</b>
-        <ol style="margin:10px 0 0 0;padding-left:20px;line-height:2.3">
-          <li>Mở <a href="https://drive.google.com" target="_blank" style="color:#1d4ed8;font-weight:600">Google Drive</a> → <b>+ Mới</b> → <b>Google Trang tính</b> (đặt tên tuỳ ý)</li>
-          <li>Trong Trang tính: menu <b>Tiện ích mở rộng</b> → <b>Apps Script</b></li>
-          <li>Xoá code mặc định, dán toàn bộ nội dung file <b>Code.gs</b> → <b>Lưu</b></li>
-          <li><b>Triển khai</b> → <b>Triển khai mới</b> → Loại: <b>Ứng dụng web</b> → Thực thi: <b>Tôi</b> → Quyền truy cập: <b>Mọi người</b> → Bấm <b>Triển khai</b> → Cấp quyền</li>
-          <li>Copy <b>URL ứng dụng web</b> → dán vào <code style="background:#dbeafe;padding:2px 7px;border-radius:4px">GAS_URL</code> trong <b>index.html</b> → Lưu và deploy lên GitHub</li>
-        </ol>
-        <div style="margin-top:12px;padding:10px 14px;background:#dcfce7;border-radius:8px;font-size:0.8rem;color:#166534">
-          <i class="fas fa-circle-check"></i> <b>Sau khi xong:</b> Mỗi lần khách hàng submit → dữ liệu tự lưu vào <b>Google Sheets</b> + email HTML gửi ngay đến <b>nguyenvietdung.bc@gmail.com</b>. Miễn phí, không giới hạn.
-        </div>
-      </div>
+  <!-- SUCCESS -->
+  <div class="sv-success" id="svSuccess">
+    <div class="sv-success-icon"><i class="fas fa-check"></i></div>
+    <h3>G&#7917;i kh&#7843;o sát thành công!</h3>
+    <p>C&#7843;m &#417;n doanh nghi&#7879;p &#273;ã dành th&#7901;i gian kh&#7843;o sát.<br>Cán b&#7897; VietinBank s&#7869; liên h&#7879; t&#432; v&#7845;n trong th&#7901;i gian s&#7899;m nh&#7845;t.</p>
+    <div id="sv-status"></div>
+    <div class="sv-actions">
+      <button class="btn-sv-email" onclick="svEmailManual()"><i class="fas fa-envelope"></i> G&#7917;i Email th&#7911; công</button>
+      <button class="btn-sv-new" onclick="svReset()"><i class="fas fa-plus"></i> Kh&#7843;o sát m&#7899;i</button>
     </div>
   </div>
-
+</div><!-- /.survey-wrapper -->
 </div><!-- end panel-survey -->
   </main>
 </div><!-- end app-layout -->
@@ -4985,319 +4743,175 @@ function rotateSugs(q){
 
 
 <script>
-// ================================================================
-// CẤU HÌNH — Dán URL web app của Google Apps Script vào đây
-// Sau khi deploy Apps Script, copy URL dán vào dưới:
-// ================================================================
 const GAS_URL = 'https://script.google.com/macros/s/AKfycbwoHSR-WvtFgteFUzkO-NBrffDVa0WyhdlYIdM6rn6IZXTIURKbwMhPatA6Ktf-FUpd/exec';
-// Ví dụ: 'https://script.google.com/macros/s/AKfycbxXXXXXX/exec'
-
-// ================================================================
-// SURVEY — Navigation, Validation, Submit, Excel Export
-// ================================================================
 let surveyCurrentStep = 1;
 
-// ---------- Scale selector ----------
-function selectScale(groupId, btn, val) {
-  document.getElementById(groupId).querySelectorAll('.scale-btn').forEach(b => b.classList.remove('selected'));
-  btn.classList.add('selected');
-  btn.dataset.val = val;
-}
-function getScale(groupId) {
-  const sel = document.querySelector('#' + groupId + ' .scale-btn.selected');
-  return sel ? sel.dataset.val : '';
-}
+function selectScale(gid,btn,val){document.getElementById(gid).querySelectorAll('.scale-btn').forEach(b=>b.classList.remove('selected'));btn.classList.add('selected');btn.dataset.val=val;}
+function getScale(gid){var s=document.querySelector('#'+gid+' .scale-btn.selected');return s?s.dataset.val:'';}
+function syncCheck(inp){inp.closest('.q-option').classList.toggle('selected',inp.checked);}
+document.addEventListener('change',function(e){if(e.target.type==='radio'){var n=e.target.name;document.querySelectorAll('input[name="'+n+'"]').forEach(function(r){r.closest('.q-option').classList.toggle('selected',r.checked);});}});
+function getChecked(gid){var v=[];document.querySelectorAll('#'+gid+' input:checked').forEach(function(i){v.push(i.value);});return v.join(', ');}
+function getRadio(name){var s=document.querySelector('input[name="'+name+'"]:checked');return s?s.value:'';}
 
-// ---------- Checkbox / Radio visual ----------
-function syncCheck(input) {
-  input.closest('.q-option').classList.toggle('selected', input.checked);
-}
-document.addEventListener('change', function(e) {
-  if (e.target.type === 'radio') {
-    const name = e.target.name;
-    document.querySelectorAll(`input[name="${name}"]`).forEach(r =>
-      r.closest('.q-option').classList.toggle('selected', r.checked));
-  }
-});
-
-// ---------- Collect values ----------
-function getChecked(groupId) {
-  const vals = [];
-  document.querySelectorAll('#' + groupId + ' input:checked').forEach(i => vals.push(i.value));
-  return vals.join(', ');
-}
-function getRadio(name) {
-  const sel = document.querySelector(`input[name="${name}"]:checked`);
-  return sel ? sel.value : '';
-}
-function collectData() {
+function collectData(){
   return {
-    timestamp:    new Date().toLocaleString('vi-VN'),
-    company:      (document.getElementById('sv_company').value   || '').trim(),
-    taxcode:      (document.getElementById('sv_taxcode').value   || '').trim(),
-    phone:        (document.getElementById('sv_phone').value     || '').trim(),
-    email:        (document.getElementById('sv_email').value     || '').trim(),
-    contact:      (document.getElementById('sv_contact').value   || '').trim(),
-    title:        (document.getElementById('sv_title').value     || '').trim(),
-    industry:     (document.getElementById('sv_industry').value  || '').trim(),
-    size:         (document.getElementById('sv_size').value      || '').trim(),
-    address:      (document.getElementById('sv_address').value   || '').trim(),
-    mainbank:     getChecked('q_mainbank'),
-    revenue:      getRadio('revenue'),
-    txcount:      getRadio('txcount'),
-    channels:     getChecked('q_channels'),
-    painpoints:   getChecked('q_painpoints'),
-    collection:   getRadio('collection'),
-    disbursement: getRadio('disbursement'),
-    cms:          getRadio('cms'),
-    erp:          getChecked('q_erp'),
-    apiscale:     getScale('q_apiscale'),
-    expectation:  (document.getElementById('sv_expectation').value || '').trim(),
-    timing:       getRadio('timing'),
+    timestamp: new Date().toLocaleString('vi-VN'),
+    company:   (document.getElementById('sv_company').value||'').trim(),
+    taxcode:   (document.getElementById('sv_taxcode').value||'').trim(),
+    phone:     (document.getElementById('sv_phone').value||'').trim(),
+    email:     (document.getElementById('sv_email').value||'').trim(),
+    contact:   (document.getElementById('sv_contact').value||'').trim(),
+    title:     (document.getElementById('sv_title').value||'').trim(),
+    industry:  (document.getElementById('sv_industry').value||'').trim(),
+    size:      (document.getElementById('sv_size').value||'').trim(),
+    address:   (document.getElementById('sv_address').value||'').trim(),
+    mainbank:  getChecked('q_mainbank'), revenue:  getRadio('revenue'),
+    txcount:   getRadio('txcount'),      channels: getChecked('q_channels'),
+    painpoints:getChecked('q_painpoints'),collection:getRadio('collection'),
+    disbursement:getRadio('disbursement'),cms:getRadio('cms'),
+    erp:       getChecked('q_erp'),      apiscale: getScale('q_apiscale'),
+    expectation:(document.getElementById('sv_expectation').value||'').trim(),
+    timing:    getRadio('timing'),
   };
 }
 
-// ---------- Validation step 1 ----------
-function validateStep1() {
-  let ok = true;
-  ['sv_company','sv_taxcode','sv_phone','sv_contact','sv_industry'].forEach(id => {
-    const el = document.getElementById(id);
-    if (!el.value.trim()) {
-      el.classList.add('error');
-      el.addEventListener('input', () => el.classList.remove('error'), { once: true });
-      ok = false;
-    }
+function validateStep1(){
+  var ok=true;
+  ['sv_company','sv_taxcode','sv_phone','sv_contact','sv_industry'].forEach(function(id){
+    var el=document.getElementById(id);
+    if(!el.value.trim()){el.classList.add('error');el.addEventListener('input',function(){el.classList.remove('error');},{once:true});ok=false;}
   });
-  if (!ok) showToast('Vui lòng điền đầy đủ các trường bắt buộc (*)', 'error');
+  if(!ok)showToast('Vui long dien day du cac truong bat buoc (*)','error');
   return ok;
 }
 
-// ---------- Step navigation ----------
-function surveyNext(cur) {
-  if (cur === 1 && !validateStep1()) return;
-  const dot = document.getElementById('sdot-' + cur);
-  dot.classList.remove('active'); dot.classList.add('done');
-  dot.querySelector('.step-circle').innerHTML = '<i class="fas fa-check" style="font-size:0.7rem"></i>';
-  surveyCurrentStep = cur + 1;
-  if (surveyCurrentStep === 4) buildSummary();
-  document.getElementById('sstep-' + cur).classList.remove('active');
-  document.getElementById('sstep-' + surveyCurrentStep).classList.add('active');
-  document.getElementById('sdot-' + surveyCurrentStep).classList.add('active');
-  document.querySelector('.content-panel').scrollTo({ top: 0, behavior: 'smooth' });
-}
-function surveyBack(cur) {
-  document.getElementById('sdot-' + cur).classList.remove('active');
-  const prevDot = document.getElementById('sdot-' + (cur - 1));
-  prevDot.classList.remove('done'); prevDot.classList.add('active');
-  prevDot.querySelector('.step-circle').textContent = cur - 1;
-  document.getElementById('sstep-' + cur).classList.remove('active');
-  surveyCurrentStep = cur - 1;
-  document.getElementById('sstep-' + surveyCurrentStep).classList.add('active');
-  document.querySelector('.content-panel').scrollTo({ top: 0, behavior: 'smooth' });
+function surveyNext(cur){
+  if(cur===1&&!validateStep1())return;
+  var dot=document.getElementById('sdot-'+cur);
+  dot.classList.remove('active');dot.classList.add('done');
+  dot.querySelector('.step-circle').innerHTML='<i class="fas fa-check" style="font-size:.7rem"></i>';
+  surveyCurrentStep=cur+1;
+  if(surveyCurrentStep===4)buildSummary();
+  document.getElementById('sstep-'+cur).classList.remove('active');
+  document.getElementById('sstep-'+surveyCurrentStep).classList.add('active');
+  document.getElementById('sdot-'+surveyCurrentStep).classList.add('active');
+  document.querySelector('.content-panel').scrollTo({top:0,behavior:'smooth'});
 }
 
-// ---------- Summary ----------
-function escSv(s) {
-  return String(s||'—').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+function surveyBack(cur){
+  document.getElementById('sdot-'+cur).classList.remove('active');
+  var pd=document.getElementById('sdot-'+(cur-1));
+  pd.classList.remove('done');pd.classList.add('active');pd.querySelector('.step-circle').textContent=cur-1;
+  document.getElementById('sstep-'+cur).classList.remove('active');
+  surveyCurrentStep=cur-1;
+  document.getElementById('sstep-'+surveyCurrentStep).classList.add('active');
+  document.querySelector('.content-panel').scrollTo({top:0,behavior:'smooth'});
 }
-function buildSummary() {
-  const d = collectData();
-  const rows = [
-    ['🏢 Tên doanh nghiệp', d.company], ['🔢 Mã số thuế', d.taxcode],
-    ['📞 Số điện thoại', d.phone],       ['📧 Email', d.email||'—'],
-    ['👤 Người liên hệ', d.contact],     ['💼 Chức vụ', d.title||'—'],
-    ['🏭 Ngành nghề', d.industry],       ['📏 Quy mô', d.size||'—'],
-    ['📍 Địa chỉ', d.address||'—'],      ['🏦 Ngân hàng chính', d.mainbank||'—'],
-    ['💰 Doanh thu/tháng', d.revenue||'—'], ['🔄 Số GD/tháng', d.txcount||'—'],
-    ['📱 Kênh thanh toán', d.channels||'—'], ['⚠️ Khó khăn', d.painpoints||'—'],
-    ['📥 Nhu cầu thu hộ', d.collection||'—'], ['📤 Nhu cầu chi hộ', d.disbursement||'—'],
-    ['🏛️ Nhu cầu CMS', d.cms||'—'],     ['💻 Phần mềm ERP', d.erp||'—'],
-    ['🔌 Ưu tiên API', d.apiscale ? d.apiscale+'/5' : '—'],
-    ['🕐 Thời điểm TK', d.timing||'—'], ['🎯 Kỳ vọng', d.expectation||'—'],
+
+function escSv(s){return String(s||'-').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');}
+
+function buildSummary(){
+  var d=collectData();
+  var rows=[
+    ['Ten doanh nghiep',d.company],['Ma so thue',d.taxcode],
+    ['So dien thoai',d.phone],['Email',d.email||'-'],
+    ['Nguoi lien he',d.contact],['Chuc vu',d.title||'-'],
+    ['Nganh nghe',d.industry],['Quy mo',d.size||'-'],['Dia chi',d.address||'-'],
+    ['Ngan hang chinh',d.mainbank||'-'],['Doanh thu/thang',d.revenue||'-'],
+    ['So GD/thang',d.txcount||'-'],['Kenh thanh toan',d.channels||'-'],
+    ['Kho khan',d.painpoints||'-'],['Thu ho',d.collection||'-'],
+    ['Chi ho',d.disbursement||'-'],['CMS',d.cms||'-'],
+    ['ERP',d.erp||'-'],['Uu tien API',d.apiscale?d.apiscale+'/5':'-'],
+    ['Thoi diem TK',d.timing||'-'],['Ky vong',d.expectation||'-'],
   ];
-  document.getElementById('survey-summary').innerHTML =
-    '<table class="summary-table">' +
-    rows.map(r => `<tr><td>${r[0]}</td><td>${escSv(r[1])}</td></tr>`).join('') +
-    '</table>';
+  document.getElementById('survey-summary').innerHTML=
+    '<table class="summary-table">'+rows.map(function(r){return '<tr><td>'+r[0]+'</td><td>'+escSv(r[1])+'</td></tr>';}).join('')+'</table>';
 }
 
-// ---------- Gửi dữ liệu lên Google Apps Script ----------
-async function postToGAS(data) {
-  if (!GAS_URL || GAS_URL === 'YOUR_APPS_SCRIPT_URL') {
-    console.warn('[Y3] GAS_URL chưa được cấu hình.');
-    return { skipped: true };
-  }
-  // no-cors: trình duyệt gửi đi nhưng không đọc response (tránh CORS error)
-  // Dữ liệu vẫn đến Apps Script và được xử lý bình thường
-  await fetch(GAS_URL, {
-    method:  'POST',
-    mode:    'no-cors',
-    headers: { 'Content-Type': 'text/plain' },
-    body:    JSON.stringify(data),
+async function postToGAS(data){
+  var res=await fetch(GAS_URL,{
+    method:'POST',
+    headers:{'Content-Type':'text/plain;charset=utf-8'},
+    body:JSON.stringify(data),
+    redirect:'follow',
   });
-  return { sent: true };
+  var txt=await res.text();
+  try{return JSON.parse(txt);}catch(e){return {success:true,raw:txt};}
 }
 
-// ---------- Xuất Excel (tải về) ----------
-function buildWorkbook(d) {
-  const rows = [
-    ['Y3 — KHẢO SÁT THÔNG TIN KHÁCH HÀNG', ''],
-    ['Thời gian khảo sát', d.timestamp],
-    ['',''],
-    ['=== THÔNG TIN DOANH NGHIỆP ===',''],
-    ['Tên doanh nghiệp', d.company], ['Mã số thuế', d.taxcode],
-    ['Số điện thoại', d.phone],       ['Email', d.email],
-    ['Người liên hệ', d.contact],     ['Chức vụ', d.title],
-    ['Ngành nghề', d.industry],       ['Quy mô', d.size], ['Địa chỉ', d.address],
-    ['',''],
-    ['=== NHU CẦU THANH TOÁN ===',''],
-    ['Ngân hàng đang dùng chính', d.mainbank],
-    ['Doanh thu hàng tháng', d.revenue], ['Số giao dịch/tháng', d.txcount],
-    ['Kênh thanh toán đang dùng', d.channels], ['Khó khăn hiện tại', d.painpoints],
-    ['',''],
-    ['=== QUẢN LÝ DÒNG TIỀN ===',''],
-    ['Nhu cầu thu hộ', d.collection], ['Nhu cầu chi hộ', d.disbursement],
-    ['Nhu cầu CMS/Pooling', d.cms],   ['Phần mềm ERP đang dùng', d.erp],
-    ['Mức ưu tiên kết nối API (1-5)', d.apiscale],
-    ['Thời điểm mong muốn triển khai', d.timing],
-    ['',''],
-    ['=== KỲ VỌNG ===',''],
-    ['Kỳ vọng từ VietinBank', d.expectation],
-  ];
-  const ws = XLSX.utils.aoa_to_sheet(rows);
-  ws['!cols'] = [{ wch: 40 }, { wch: 65 }];
-  const wb = XLSX.utils.book_new();
-  XLSX.utils.book_append_sheet(wb, ws, 'Khảo sát KH');
-  return wb;
-}
-function exportExcel() {
-  if (typeof XLSX === 'undefined') { showToast('Thư viện Excel chưa sẵn sàng, thử lại.', 'error'); return; }
-  const d = collectData();
-  const wb = buildWorkbook(d);
-  const fname = 'Y3_KhaoSat_' + d.company.replace(/\s+/g,'_').substring(0,30) + '_' + new Date().toISOString().slice(0,10) + '.xlsx';
-  XLSX.writeFile(wb, fname);
-  showToast('✅ Đã tải file Excel: ' + fname, 'success');
-}
+async function surveySubmit(){
+  var btn=document.getElementById('sv-submit-btn');
+  btn.disabled=true;btn.innerHTML='<i class="fas fa-spinner fa-spin"></i> Dang gui...';
+  var d=collectData();
+  var ok=false;var errMsg='';
+  try{
+    var r=await postToGAS(d);
+    ok=(r&&(r.success===true||r.message));
+    if(!ok)errMsg=r&&r.error?r.error:'Khong nhan duoc phan hoi.';
+  }catch(e){errMsg=e.message||'Loi ket noi.';}
 
-// ---------- Submit ----------
-async function surveySubmit() {
-  const btn = document.querySelector('.btn-survey-submit');
-  btn.disabled = true;
-  btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Đang gửi...';
-
-  const d = collectData();
-
-  // Gửi lên Google Apps Script (lưu Sheets + email)
-  let result;
-  try { result = await postToGAS(d); }
-  catch(e) { console.error('[Y3] POST error:', e); result = { error: true }; }
-
-  // Hiện màn hình thành công
   document.getElementById('sstep-4').classList.remove('active');
   document.getElementById('sdot-4').classList.remove('active');
   document.getElementById('sdot-4').classList.add('done');
-  document.getElementById('surveyProgress').style.opacity = '0.5';
+  document.getElementById('surveyProgress').style.opacity='0.5';
   document.getElementById('surveySuccess').classList.add('show');
 
-  const statusEl = document.getElementById('sv-email-status');
-  if (result && result.skipped) {
-    statusEl.innerHTML =
-      '<div style="background:#fef3c7;border:1px solid #f59e0b;border-radius:10px;padding:14px 18px;font-size:0.85rem;color:#92400e;margin-bottom:16px;text-align:left">' +
-      '<i class="fas fa-triangle-exclamation"></i> <strong>Apps Script chưa được cấu hình.</strong> ' +
-      'Dữ liệu chưa được lưu. Xem hướng dẫn bên dưới để hoàn tất thiết lập.</div>';
-  } else {
-    statusEl.innerHTML =
-      '<div style="background:#dcfce7;border:1px solid #22c55e;border-radius:10px;padding:14px 18px;font-size:0.85rem;color:#166534;margin-bottom:16px;text-align:left">' +
-      '<i class="fas fa-circle-check"></i> <strong>Đã gửi thành công!</strong> ' +
-      'Dữ liệu đang được lưu vào Google Sheets và email tự động gửi đến <strong>nguyenvietdung.bc@gmail.com</strong>.</div>';
+  var st=document.getElementById('sv-email-status');
+  if(ok){
+    st.innerHTML='<div style="background:#dcfce7;border:1px solid #22c55e;border-radius:10px;padding:14px 18px;font-size:.85rem;color:#166534;text-align:left">'+
+      '<i class="fas fa-circle-check"></i> <strong>Da luu va gui email thanh cong!</strong> '+
+      'Du lieu da luu vao Google Sheets va email da gui den <strong>nguyenvietdung.bc@gmail.com</strong>.</div>';
+  }else{
+    st.innerHTML='<div style="background:#fee2e2;border:1px solid #ef4444;border-radius:10px;padding:14px 18px;font-size:.85rem;color:#991b1b;text-align:left">'+
+      '<i class="fas fa-circle-xmark"></i> <strong>Gui tu dong that bai.</strong> Loi: '+escSv(errMsg)+
+      ' - Bam <strong>"Gui Email thu cong"</strong> de gui truc tiep.</div>';
   }
-
-  // Auto tải Excel
-  setTimeout(exportExcel, 700);
-
-  btn.disabled = false;
-  btn.innerHTML = '<i class="fas fa-paper-plane"></i> Gửi khảo sát';
-  document.querySelector('.content-panel').scrollTo({ top: 0, behavior: 'smooth' });
+  btn.disabled=false;btn.innerHTML='<i class="fas fa-paper-plane"></i> Gui khao sat';
+  document.querySelector('.content-panel').scrollTo({top:0,behavior:'smooth'});
 }
 
-// ---------- Gửi email thủ công (dự phòng) ----------
-function sendEmailManual() {
-  const d = collectData();
-  const subject = encodeURIComponent('Y3 - khảo sát khách hàng: ' + d.company);
-  const body = encodeURIComponent(
-`Y3 — KHẢO SÁT KHÁCH HÀNG · ${d.timestamp}
-============================================================
-THÔNG TIN DOANH NGHIỆP
-Tên DN      : ${d.company}
-MST         : ${d.taxcode}
-Điện thoại  : ${d.phone}
-Email       : ${d.email}
-Người LH    : ${d.contact} (${d.title})
-Ngành nghề  : ${d.industry}
-Quy mô      : ${d.size}
-Địa chỉ     : ${d.address}
-
-NHU CẦU THANH TOÁN
-Ngân hàng   : ${d.mainbank}
-Doanh thu   : ${d.revenue}
-Số GD/tháng : ${d.txcount}
-Kênh TT     : ${d.channels}
-Khó khăn    : ${d.painpoints}
-
-QUẢN LÝ DÒNG TIỀN
-Thu hộ      : ${d.collection}
-Chi hộ      : ${d.disbursement}
-CMS/Pooling : ${d.cms}
-ERP         : ${d.erp}
-API (1-5)   : ${d.apiscale}
-Triển khai  : ${d.timing}
-
-KỲ VỌNG
-${d.expectation}
-============================================================
-(Đính kèm file Excel đã tải về để gửi kèm)`);
-  window.open(`mailto:nguyenvietdung.bc@gmail.com?subject=${subject}&body=${body}`);
+function sendEmailManual(){
+  var d=collectData();
+  var subj=encodeURIComponent('Y3 - khao sat khach hang: '+d.company);
+  var body=encodeURIComponent(
+    'Y3 KHAO SAT KHACH HANG\n'
+    +'Thoi gian: '+d.timestamp+'\n\n'
+    +'Ten DN: '+d.company+'\nMST: '+d.taxcode+'\nDT: '+d.phone+'\nEmail: '+d.email+'\n'
+    +'Nguoi LH: '+d.contact+' ('+d.title+')\nNganh: '+d.industry+'\nQuy mo: '+d.size+'\nDia chi: '+d.address+'\n\n'
+    +'THANH TOAN\nNgan hang: '+d.mainbank+'\nDoanh thu: '+d.revenue+'\nSo GD: '+d.txcount+'\n'
+    +'Kenh TT: '+d.channels+'\nKho khan: '+d.painpoints+'\n\n'
+    +'DONG TIEN\nThu ho: '+d.collection+'\nChi ho: '+d.disbursement+'\nCMS: '+d.cms+'\n'
+    +'ERP: '+d.erp+'\nAPI: '+d.apiscale+'\nTrien khai: '+d.timing+'\n\nKy vong:\n'+d.expectation
+  );
+  window.open('mailto:nguyenvietdung.bc@gmail.com?subject='+subj+'&body='+body);
 }
 
-// ---------- Reset ----------
-function resetSurvey() {
-  ['sv_company','sv_taxcode','sv_phone','sv_email','sv_contact','sv_title','sv_address','sv_expectation']
-    .forEach(id => { const el = document.getElementById(id); if (el) el.value = ''; });
-  ['sv_industry','sv_size']
-    .forEach(id => { const el = document.getElementById(id); if (el) el.selectedIndex = 0; });
-  document.querySelectorAll('.q-option input').forEach(i => {
-    i.checked = false; i.closest('.q-option').classList.remove('selected');
-  });
-  document.querySelectorAll('.scale-btn').forEach(b => { b.classList.remove('selected'); delete b.dataset.val; });
-  for (let i = 1; i <= 4; i++) {
-    const step = document.getElementById('sstep-' + i); if (step) step.classList.remove('active');
-    const dot  = document.getElementById('sdot-' + i);
-    if (dot) {
-      dot.classList.remove('active','done');
-      if (i < 4) dot.querySelector('.step-circle').textContent = i;
-      else dot.querySelector('.step-circle').innerHTML = '<i class="fas fa-check" style="font-size:0.7rem"></i>';
-    }
+function resetSurvey(){
+  ['sv_company','sv_taxcode','sv_phone','sv_email','sv_contact','sv_title','sv_address','sv_expectation'].forEach(function(id){var el=document.getElementById(id);if(el)el.value='';});
+  ['sv_industry','sv_size'].forEach(function(id){var el=document.getElementById(id);if(el)el.selectedIndex=0;});
+  document.querySelectorAll('.q-option input').forEach(function(i){i.checked=false;i.closest('.q-option').classList.remove('selected');});
+  document.querySelectorAll('.scale-btn').forEach(function(b){b.classList.remove('selected');delete b.dataset.val;});
+  for(var i=1;i<=4;i++){
+    var s=document.getElementById('sstep-'+i);if(s)s.classList.remove('active');
+    var dt=document.getElementById('sdot-'+i);
+    if(dt){dt.classList.remove('active','done');
+      if(i<4)dt.querySelector('.step-circle').textContent=i;
+      else dt.querySelector('.step-circle').innerHTML='<i class="fas fa-check" style="font-size:.7rem"></i>';}
   }
   document.getElementById('sstep-1').classList.add('active');
   document.getElementById('sdot-1').classList.add('active');
-  document.getElementById('surveyProgress').style.opacity = '1';
+  document.getElementById('surveyProgress').style.opacity='1';
   document.getElementById('surveySuccess').classList.remove('show');
-  document.getElementById('sv-email-status').innerHTML = '';
-  surveyCurrentStep = 1;
-  document.querySelector('.content-panel').scrollTo({ top: 0, behavior: 'smooth' });
+  document.getElementById('sv-email-status').innerHTML='';
+  surveyCurrentStep=1;
+  document.querySelector('.content-panel').scrollTo({top:0,behavior:'smooth'});
 }
 
-// ---------- Toast ----------
-function showToast(msg, type) {
-  const ex = document.getElementById('svToast'); if (ex) ex.remove();
-  const t = document.createElement('div'); t.id = 'svToast';
-  t.style.cssText = `position:fixed;bottom:100px;left:50%;transform:translateX(-50%);
-    background:${type==='error'?'#ef4444':'#16a34a'};color:white;padding:12px 24px;
-    border-radius:10px;font-size:0.88rem;font-weight:600;box-shadow:0 4px 20px rgba(0,0,0,0.2);
-    z-index:9999;animation:fadeInStep 0.3s ease;max-width:90vw;text-align:center;`;
-  t.textContent = msg;
-  document.body.appendChild(t);
-  setTimeout(() => t.remove(), 3500);
+function showToast(msg,type){
+  var ex=document.getElementById('svToast');if(ex)ex.remove();
+  var t=document.createElement('div');t.id='svToast';
+  t.style.cssText='position:fixed;bottom:100px;left:50%;transform:translateX(-50%);background:'+(type==='error'?'#ef4444':'#16a34a')+';color:white;padding:12px 24px;border-radius:10px;font-size:.88rem;font-weight:600;box-shadow:0 4px 20px rgba(0,0,0,.2);z-index:9999;max-width:90vw;text-align:center;';
+  t.textContent=msg;document.body.appendChild(t);setTimeout(function(){t.remove();},3500);
 }
 </script>
 
