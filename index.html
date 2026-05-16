@@ -4357,9 +4357,7 @@
     <div class="sv-success-icon"><i class="fas fa-check"></i></div>
     <h3>G&#7917;i kh&#7843;o sát thành công!</h3>
     <p>C&#7843;m &#417;n doanh nghi&#7879;p &#273;ã dành th&#7901;i gian kh&#7843;o sát.<br>Cán b&#7897; VietinBank s&#7869; liên h&#7879; t&#432; v&#7845;n trong th&#7901;i gian s&#7899;m nh&#7845;t.</p>
-    <div id="sv-status"></div>
     <div class="sv-actions">
-      <button class="btn-sv-email" onclick="svEmailManual()"><i class="fas fa-envelope"></i> G&#7917;i Email th&#7911; công</button>
       <button class="btn-sv-new" onclick="svReset()"><i class="fas fa-plus"></i> Kh&#7843;o sát m&#7899;i</button>
     </div>
   </div>
@@ -4876,16 +4874,15 @@ function svBuildSummary() {
     '</table>';
 }
 
-// ---- POST to Google Apps Script ----
+// ---- POST to Google Apps Script (no-cors: data reaches GAS, response unreadable) ----
 async function svPost(data) {
-  var res = await fetch(GAS_URL, {
+  await fetch(GAS_URL, {
     method: 'POST',
+    mode: 'no-cors',
     headers: { 'Content-Type': 'text/plain;charset=utf-8' },
     body: JSON.stringify(data),
-    redirect: 'follow',
   });
-  var txt = await res.text();
-  try { return JSON.parse(txt); } catch(e) { return { success: true, raw: txt }; }
+  return { success: true };
 }
 
 // ---- Submit ----
@@ -4894,30 +4891,14 @@ async function svSubmit() {
   btn.disabled = true;
   btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Dang gui...';
   var d = svCollect();
-  var ok = false; var errMsg = '';
-  try {
-    var r = await svPost(d);
-    ok = r && (r.success === true || !!r.message);
-    if (!ok) errMsg = (r && r.error) ? r.error : 'Khong nhan duoc phan hoi.';
-  } catch(e) { errMsg = e.message || 'Loi ket noi mang.'; }
-
-  // Show success screen
+  // Fire-and-forget (no-cors): data reaches GAS regardless of response
+  svPost(d).catch(function(){});
+  // Show success immediately
   document.getElementById('sstep-4').classList.remove('active');
   document.getElementById('sdot-4').classList.remove('active');
   document.getElementById('sdot-4').classList.add('done');
   document.getElementById('svProgress').style.opacity = '0.5';
   document.getElementById('svSuccess').classList.add('show');
-
-  var st = document.getElementById('sv-status');
-  if (ok) {
-    st.innerHTML = '<div style="background:#dcfce7;border:1px solid #22c55e;border-radius:10px;padding:14px 18px;font-size:.85rem;color:#166534;text-align:left;margin-bottom:12px">'
-      + '<i class="fas fa-circle-check"></i> <strong>Da gui thanh cong!</strong> '
-      + 'Du lieu da luu vao Google Sheets va email da gui den nguyenvietdung.bc@gmail.com.</div>';
-  } else {
-    st.innerHTML = '<div style="background:#fee2e2;border:1px solid #ef4444;border-radius:10px;padding:14px 18px;font-size:.85rem;color:#991b1b;text-align:left;margin-bottom:12px">'
-      + '<i class="fas fa-circle-xmark"></i> <strong>Gui tu dong that bai.</strong> ' + svEsc(errMsg)
-      + ' &mdash; Bam <strong>Gui Email thu cong</strong> de gui truc tiep.</div>';
-  }
   btn.disabled = false;
   btn.innerHTML = '<i class="fas fa-paper-plane"></i> Gui khao sat';
   document.querySelector('.content-panel').scrollTo({ top: 0, behavior: 'smooth' });

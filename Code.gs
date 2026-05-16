@@ -6,6 +6,7 @@
 // ================================================================
 
 const EMAIL_TO   = 'nguyenvietdung.bc@gmail.com';
+const SHEET_ID   = '1WytwKAtL-wU7S0lWmHnj3Eo7A-tFzVnWLzD-14ikylc'; // Google Sheet cụ thể
 const SHEET_NAME = 'Khảo sát KH';
 
 // ----------------------------------------------------------------
@@ -40,7 +41,7 @@ function doGet() {
 // Lưu vào Google Sheets
 // ----------------------------------------------------------------
 function saveToSheet(d) {
-  const ss    = SpreadsheetApp.getActiveSpreadsheet();
+  const ss    = SpreadsheetApp.openById(SHEET_ID);
   let   sheet = ss.getSheetByName(SHEET_NAME);
 
   // Tạo sheet + header nếu chưa có
